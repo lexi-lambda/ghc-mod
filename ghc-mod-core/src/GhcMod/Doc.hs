@@ -16,8 +16,8 @@ showPage dflag style = showDocWith dflag PageMode . withStyle dflag style
 showOneLine :: DynFlags -> PprStyle -> SDoc -> String
 showOneLine dflag style = showDocWith dflag OneLineMode . withStyle dflag style
 
-getStyle :: GhcMonad m => DynFlags -> m PprStyle
-getStyle df = do
+getStyle :: GhcMonad m => m PprStyle
+getStyle = do
     unqual <- getPrintUnqual
 #if __GLASGOW_HASKELL__ >= 802
     dflags <- getDynFlags

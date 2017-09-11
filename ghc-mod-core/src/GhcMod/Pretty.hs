@@ -44,7 +44,7 @@ import GhcMod.Gap (renderGm)
 renderSDoc :: GhcMonad m => SDoc -> m Doc
 renderSDoc sdoc = do
   df <- getSessionDynFlags
-  ppsty <- getStyle df
+  ppsty <- getStyle
   return $ withPprStyleDoc df ppsty sdoc
 
 gmComponentNameDoc :: ChComponentName -> Doc
