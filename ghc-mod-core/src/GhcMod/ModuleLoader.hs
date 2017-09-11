@@ -29,6 +29,8 @@ module GhcMod.ModuleLoader
   , getNamesAtPos
   , unpackRealSrcSpan
   , toPos
+  , filePathToUri
+  , uriToFilePath
   -- * Extensible state Usage
   -- $usage
   , ExtensionClass(..)
