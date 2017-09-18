@@ -4,7 +4,7 @@ stages:
 .before_script_template: &common_before_script
   before_script:
     - ls -l ..
-    - apt-get update && apt-get install alex happy
+    - apt-get update && apt-get install alex happy libtinfo-dev
     - mkdir -p ../ghc-mod.sdist-$CI_PIPELINE_ID
     - touch ChangeLog
     - cabal update
