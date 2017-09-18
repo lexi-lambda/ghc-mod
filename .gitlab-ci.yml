@@ -8,7 +8,7 @@ stages:
     - mkdir -p ../ghc-mod.sdist-$CI_PIPELINE_ID
     - touch ChangeLog
     - cabal update
-    - (cd .. && git clone https://github.com/DanielG/cabal-helper.git)
+    - (cd .. && git clone https://github.com/alanz/cabal-helper.git)
     - cabal sdist --output-directory=../ghc-mod.sdist-$CI_PIPELINE_ID
     - cd ../ghc-mod.sdist-$CI_PIPELINE_ID
     - cabal sandbox init
