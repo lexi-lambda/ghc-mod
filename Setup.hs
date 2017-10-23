@@ -1,4 +1,3 @@
-#!/usr/bin/env runhaskell
 
 {-# LANGUAGE CPP #-}
 
