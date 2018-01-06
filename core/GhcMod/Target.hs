@@ -200,7 +200,7 @@ targetGhcOptions crdl sefnmn = do
  where
    zipMap f l = l `zip` (f `map` l)
 
-   cabalOpts :: Cradle -> GhcModT m [String]
+   cabalOpts :: Cradle -> GhcModT m [GHCOption]
    cabalOpts Cradle{..} = do
        mcs <- cabalResolvedComponents
 
@@ -216,13 +216,15 @@ targetGhcOptions crdl sefnmn = do
             let cns = filter (/= ChSetupHsName) $ Map.keys mcs
 
             gmLog GmDebug "" $ strDoc $ "Could not find a component assignment, falling back to picking library component in cabal file."
-            return $ gmcGhcOpts $ fromJustNote "targetGhcOptions, no-assignment" $ Map.lookup (head cns) mcs
+            return $ gmcGhcOpts (fromJustNote "targetGhcOptions, no-assignment" $ Map.lookup (head cns) mcs)
+                      ++ ["-Wno-missing-home-modules"]
           else do
             when noCandidates $
               throwError $ GMECabalCompAssignment mdlcs
 
             let cn = pickComponent candidates
-            return $ gmcGhcOpts $ fromJustNote "targetGhcOptions" $ Map.lookup cn mcs
+            return $ gmcGhcOpts (fromJustNote "targetGhcOptions" $ Map.lookup cn mcs)
+                       ++ ["-Wno-missing-home-modules"]
 
 resolvedComponentsCache :: IOish m => FilePath ->
     Cached (GhcModT m) GhcModState
@@ -311,7 +313,7 @@ packageGhcOptions = do
           | otherwise -> sandboxOpts crdl
 
 -- also works for plain projects!
-sandboxOpts :: (IOish m, GmEnv m) => Cradle -> m [String]
+sandboxOpts :: (IOish m, GmEnv m) => Cradle -> m [GHCOption]
 sandboxOpts crdl = do
     mCusPkgDb <- getCustomPkgDbStack
     pkgDbStack <- liftIO $ getSandboxPackageDbStack
@@ -367,8 +369,8 @@ resolveEntrypoint Cradle {..} c@GmComponent {..} = do
 -- ghc do the warning about it. Right now we run that module through
 -- resolveModule like any other
 resolveChEntrypoints :: FilePath -> ChEntrypoint -> IO [CompilationUnit]
-resolveChEntrypoints _ (ChLibEntrypoint em om _) =
-    return $ map (Right . chModToMod) (em ++ om)
+resolveChEntrypoints _ (ChLibEntrypoint em om sm) =
+    return $ map (Right . chModToMod) (em ++ om ++ sm)
 
 resolveChEntrypoints _ (ChExeEntrypoint main om) =
     return $ [Left main] ++ map (Right . chModToMod) om
