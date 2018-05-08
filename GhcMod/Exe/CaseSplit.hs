@@ -14,7 +14,7 @@ import System.FilePath
 import Prelude
 
 import qualified DataCon as Ty
-import GHC (GhcMonad, LPat, ParsedModule(..), TypecheckedModule(..), DynFlags, SrcSpan, Type, GenLocated(L))
+import GHC (GhcMonad, LPat, TypecheckedModule(..), DynFlags, SrcSpan, Type, GenLocated(L))
 import qualified GHC as G
 import Outputable (PprStyle)
 import qualified TyCon as Ty
@@ -78,9 +78,8 @@ splits file lineNo colNo =
 -- Meant for library-usage.
 splits' :: IOish m => FilePath -> TypecheckedModule -> Int -> Int -> GhcModT m (Maybe SplitResult)
 splits' file tcm lineNo colNo =
-  ghandle handler $ runGmlT' [Right modName] deferErrors $ performSplit file tcm lineNo colNo
+  ghandle handler $ runGmlT' [Left file] deferErrors $ performSplit file tcm lineNo colNo
   where
-    modName = G.ms_mod_name $ pm_mod_summary $ tm_parsed_module tcm
     handler (SomeException ex) = do
       gmLog GmException "splits'" $
             text "" $$ nest 4 (showToDoc ex)
@@ -100,8 +99,8 @@ constructSplitResult file maybeSplitInfo dflag style = do
   startLoc <- maybeSrcSpanStart $ sBindingSpan splitToTextInfo
   endLoc <- maybeSrcSpanEnd $ sBindingSpan splitToTextInfo
   let startLine = G.srcLocLine startLoc
-      startCol  = G.srcLocLine startLoc
-      endLine   = G.srcLocCol endLoc
+      startCol  = G.srcLocCol startLoc
+      endLine   = G.srcLocLine endLoc
       endCol    = G.srcLocCol endLoc
       newText   = genCaseSplitTextFile file splitToTextInfo
   return $ SplitResult startLine startCol endLine endCol . T.pack <$> newText
