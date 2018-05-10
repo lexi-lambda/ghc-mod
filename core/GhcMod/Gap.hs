@@ -618,7 +618,7 @@ type GhcRn = Name
 type GhcTc = Id
 #endif
 
-#if __GLASGOW_HASKELL__ >= 840
+#if __GLASGOW_HASKELL__ >= 804
 type GLMatchI = LMatch GhcTc (LHsExpr GhcTc)
 #elif __GLASGOW_HASKELL__ >= 708
 type GLMatch = LMatch GhcPs (LHsExpr GhcPs)
