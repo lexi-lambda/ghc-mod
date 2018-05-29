@@ -100,8 +100,8 @@ constructSplitResult file maybeSplitInfo dflag style = do
   startLoc <- maybeSrcSpanStart $ sBindingSpan splitToTextInfo
   endLoc <- maybeSrcSpanEnd $ sBindingSpan splitToTextInfo
   let startLine = G.srcLocLine startLoc
-      startCol  = G.srcLocLine startLoc
-      endLine   = G.srcLocCol endLoc
+      startCol  = G.srcLocCol startLoc
+      endLine   = G.srcLocLine endLoc
       endCol    = G.srcLocCol endLoc
       newText   = genCaseSplitTextFile file splitToTextInfo
   return $ SplitResult startLine startCol endLine endCol . T.pack <$> newText
