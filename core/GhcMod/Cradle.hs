@@ -107,9 +107,11 @@ cabalCradle cabalProg wdir = do
     --       Or default to is for cabal >= 2.0 ?, unless flag saying old style
     if isDistNewstyle
       then do
+        gmLog GmInfo "" $ text "Using Cabal new-build project at 1" <+>: text cabalDir
         dd <- liftIO $ runQuery (mkQueryEnv cabalDir "dist-newstyle") distDir
 
         gmLog GmInfo "" $ text "Using Cabal new-build project at" <+>: text cabalDir
+        gmLog GmInfo "" $ text "Using Cabal new-build project at 2:dd=" <+>: text dd
         return Cradle {
             cradleProject    = CabalNewProject
           , cradleCurrentDir = wdir

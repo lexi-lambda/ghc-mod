@@ -157,8 +157,10 @@ withCabal :: (IOish m, GmEnv m, GmOut m, GmLog m) => m a -> m a
 withCabal action = do
     crdl <- cradle
     mCabalFile          <- liftIO $ timeFile `traverse` cradleCabalFile crdl
-    mCabalConfig        <- liftIO $ timeMaybe (setupConfigFile crdl)
+    mCabalConfig        <- liftIO $ timeMaybe (setupConfigFile' crdl)
     mCabalSandboxConfig <- liftIO $ timeMaybe (sandboxConfigFile crdl)
+
+    gmLog GmDebug "" $ strDoc $ "withCabal:(mCabalFile,mCabalConfig)=" ++ show (cradleCabalFile crdl,setupConfigFile' crdl)
 
     let haveSetupConfig = isJust mCabalConfig
 

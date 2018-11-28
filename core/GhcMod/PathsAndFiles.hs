@@ -194,11 +194,23 @@ setupConfigFile :: Cradle -> FilePath
 setupConfigFile crdl =
     cradleRootDir crdl </> setupConfigPath (cradleDistDir crdl)
 
+setupConfigFile' :: Cradle -> FilePath
+setupConfigFile' crdl =
+  case cradleProject crdl of
+    CabalNewProject ->
+      cradleRootDir crdl </> planJsonPath    (cradleRootDir crdl)
+    _ ->
+      cradleRootDir crdl </> setupConfigPath (cradleDistDir crdl)
+
 sandboxConfigFile :: Cradle -> FilePath
 sandboxConfigFile crdl = cradleRootDir crdl </> sandboxConfigFileName
 
 sandboxConfigFileName :: String
 sandboxConfigFileName = "cabal.sandbox.config"
+
+-- | Path to 'plan.json' file, usually @dist-newstyle/cache/plan.json@
+planJsonPath :: FilePath -> FilePath
+planJsonPath root = root </> "dist-newstyle" </> "cache" </> "plan.json"
 
 -- | Path to 'LocalBuildInfo' file, usually @dist/setup-config@
 setupConfigPath :: FilePath -> FilePath

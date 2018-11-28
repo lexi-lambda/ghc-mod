@@ -33,7 +33,7 @@ getCurrentWorld = do
     crdl <- cradle
     pkgCaches    <- timedPackageCaches
     mCabalFile   <- liftIO $ timeFile `traverse` cradleCabalFile crdl
-    mCabalConfig <- liftIO $ timeMaybe (setupConfigFile crdl)
+    mCabalConfig <- liftIO $ timeMaybe (setupConfigFile' crdl)
     mCabalSandboxConfig <- liftIO $ timeMaybe (sandboxConfigFile crdl)
     mFileMap     <- getMMappedFiles
 
