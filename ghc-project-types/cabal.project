@@ -1,8 +1,4 @@
 packages: .
-          ./core
-          ./ghc-project-types
-          -- ../cabal-helper
-          -- ../polyparse
 
 source-repository-package
     type: git
