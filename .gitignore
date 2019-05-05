@@ -1,4 +1,5 @@
 dist/
+dist-newstyle/
 elisp/*.elc
 *~
 /.cabal-sandbox/
@@ -8,6 +9,7 @@ elisp/*.elc
 /test/data/**/.cabal-sandbox
 add-source-timestamps
 package.cache
+cabal.project.local*
 cabal.sandbox.config
 # Mac OS generates
 # .DS_Store
@@ -25,3 +27,4 @@ cabal-dev
 /.bash_history
 /.travis.yml.orig
 /cabal.project.az
+.ghc.environment*

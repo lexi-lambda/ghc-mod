@@ -1,0 +1,6 @@
+packages: .
+
+source-repository-package
+    type: git
+    location: https://github.com/alanz/cabal-helper
+    tag: 8fecf6a7754424ed1653dce632382707e8f03499

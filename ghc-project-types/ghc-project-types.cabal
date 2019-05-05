@@ -1,4 +1,4 @@
-Name:                   ghc-mod-core
+Name:                   ghc-project-types
 Version:                5.9.0.0
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>,
                         Daniel Gröber <dxld@darkboxed.org>,
@@ -26,61 +26,16 @@ Description:
 Category:               GHC, Development
 Cabal-Version:          >= 1.24
 Build-Type:             Simple
-Extra-Source-Files:     GhcMod/Monad/Compat.hs_h
+-- Extra-Source-Files:     GhcMod/Monad/Compat.hs_h
 
 Library
   Default-Language:     Haskell2010
   GHC-Options:          -Wall -fno-warn-deprecations
-  Default-Extensions:   ScopedTypeVariables, RecordWildCards, NamedFieldPuns,
-                        ConstraintKinds, FlexibleContexts,
-                        DataKinds, KindSignatures, TypeOperators, ViewPatterns
-  HS-Source-Dirs:       . shared
+  HS-Source-Dirs:       ./src
   Exposed-Modules:
-                        GhcModCore
-                        GhcMod.CabalHelper
-                        GhcMod.Caching
-                        GhcMod.Caching.Types
-                        GhcMod.Convert
-                        GhcMod.Cradle
-                        GhcMod.CustomPackageDb
-                        GhcMod.DebugLogger
-                        GhcMod.Doc
-                        GhcMod.DynFlags
-                        GhcMod.DynFlagsTH
-                        GhcMod.Error
-                        GhcMod.FileMapping
-                        GhcMod.Gap
-                        GhcMod.GhcPkg
-                        GhcMod.HomeModuleGraph
-                        GhcMod.LightGhc
-                        GhcMod.Logger
-                        GhcMod.Logging
-                        GhcMod.ModuleLoader
-                        GhcMod.Monad
-                        GhcMod.Monad.Env
-                        GhcMod.Monad.Log
-                        GhcMod.Monad.Newtypes
-                        GhcMod.Monad.Orphans
-                        GhcMod.Monad.Out
-                        GhcMod.Monad.State
-                        GhcMod.Monad.Types
-                        GhcMod.Options.DocUtils
-                        GhcMod.Options.Help
-                        GhcMod.Options.Options
-                        GhcMod.Output
-                        GhcMod.PathsAndFiles
-                        GhcMod.Pretty
-                        GhcMod.Read
-                        GhcMod.SrcUtils
-                        GhcMod.Stack
-                        GhcMod.Target
-                        GhcMod.Types
-                        GhcMod.Utils
-                        GhcMod.World
-                        Utils
+                        GhcProject.Types
                         Data.Binary.Generic
-                        System.Directory.ModTime
-  Other-Modules:        Paths_ghc_mod_core
+  -- Other-Modules:        Paths_ghc_mod_core
   Build-Depends:
                       -- See Note [GHC Boot libraries]
                         binary
@@ -88,7 +43,6 @@ Library
                       , containers
                       , deepseq
                       , directory
-                      , ghc-project-types
                       , filepath
                       , mtl
                       , process
@@ -111,7 +65,7 @@ Library
                       , temporary            < 1.3  && >= 1.2.0.3
                       , transformers-base    < 0.5  && >= 0.4.4
 
-                      , cabal-helper         < 1.10  && >= 1.0.0.0
+                      , cabal-helper         < 1.1  && >= 1.0
                       , ghc                  < 8.7  && >= 7.6
 
   if impl(ghc >= 8.0)
