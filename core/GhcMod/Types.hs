@@ -168,8 +168,7 @@ data Cradle = Cradle {
   -- | The build info directory.
   , cradleDistDir    :: FilePath
   , cradleQueryEnv   :: !(Maybe Dynamic) -- QueryEnv pt
-  }
-  -- } deriving (Eq, Ord, Show)
+  } deriving (Show)
 
 data ProjSetup (pt :: ProjType) =
   ProjSetup

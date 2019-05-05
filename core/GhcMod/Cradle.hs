@@ -259,7 +259,7 @@ shouldLoadGhcEnvironment crdl =
 oldBuild :: ProjSetup 'V1
 oldBuild = ProjSetup
     { psDistDir   = \dir        -> DistDirV1 (dir </> "dist")
-    , psProjDir   = \cabal_file -> ProjLocCabalFile cabal_file
+    , psProjDir   = \cabal_file -> ProjLocV1CabalFile cabal_file
     }
 
 newBuild :: ProjSetup 'V2
