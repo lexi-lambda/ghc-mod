@@ -46,6 +46,8 @@ import Distribution.Helper (runQuery, mkQueryEnv, compilerVersion, DistDir(..), 
 import Data.List (intercalate)
 import Data.Version (Version(..))
 
+import Debug.Trace
+
 ----------------------------------------------------------------
 
 -- | Finding 'Cradle'.
@@ -125,7 +127,7 @@ cabalCradle cabalProg wdir = do
         -- runQuery :: Query pt a -> QueryEnv pt -> IO a
         -- dd <- liftIO $ runQuery (mkQueryEnv cabalDir "dist-newstyle") distDir
         let dd = "dist-newstyle"
-        qe <- MaybeT $ Just <$> makeQueryEnv newBuild cabalFile
+        qe <- MaybeT $ Just <$> makeQueryEnv newBuild cabalFile cabalDir
 
         gmLog GmInfo "" $ text "Using Cabal new-build project at" <+>: text cabalDir
         return Cradle {
@@ -138,7 +140,7 @@ cabalCradle cabalProg wdir = do
           , cradleQueryEnv   = Just $ toDyn qe
           }
       else do
-        qe <- MaybeT $ Just <$> makeQueryEnv oldBuild cabalFile
+        qe <- MaybeT $ Just <$> makeQueryEnv oldBuild cabalFile cabalDir
         gmLog GmInfo "" $ text "Using Cabal project at" <+>: text cabalDir
         return Cradle {
             cradleProject    = CabalProject
@@ -158,15 +160,15 @@ stackCradle stackProg wdir = do
     mzero
 #endif
 
-    cabalFile <- MaybeT $ liftIO $ findCabalFile wdir
-    let cabalDir = takeDirectory cabalFile
-    _stackConfigFile <- MaybeT $ liftIO $ findStackConfigFile cabalDir
+    cabalFile <- MaybeT $ liftIO $ (traceShowId <$> findCabalFile wdir)
+    stackConfigFile <- MaybeT $ liftIO $ (traceShowId <$> findStackConfigFile (takeDirectory cabalFile))
+    let stackDir = takeDirectory stackConfigFile
 
-    gmLog GmInfo "" $ text "Found Stack project at" <+>: text cabalDir
+    gmLog GmInfo "" $ text "Found Stack project at" <+>: text stackDir
 
     stackExeSet    <- liftIO $ isJust <$> lookupEnv "STACK_EXE"
     stackExeExists <- liftIO $ isJust <$> findExecutable stackProg
-    setupCfgExists <- liftIO $ doesFileExist $ cabalDir </> setupConfigPath "dist"
+    setupCfgExists <- liftIO $ doesFileExist $ (takeDirectory cabalFile) </> setupConfigPath "dist"
 
     case (stackExeExists, stackExeSet) of
       (False, True) -> do
@@ -186,15 +188,15 @@ stackCradle stackProg wdir = do
 
       (True, False) -> return ()
 
-    senv <- MaybeT $ getStackEnv cabalDir stackProg
+    senv <- MaybeT $ getStackEnv stackDir stackProg
 
-    gmLog GmInfo "" $ text "Using Stack project at" <+>: text cabalDir
+    gmLog GmInfo "" $ text "Using Stack project at" <+>: text stackDir
     gmLog GmInfo "" $ text "Using Stack dist dir at" <+>: text (seDistDir senv) -- AZ
-    qe <- MaybeT $ Just <$> makeQueryEnv stackBuild cabalFile
+    qe <- MaybeT $ Just <$> makeQueryEnv stackBuild cabalFile stackDir
     return Cradle {
         cradleProject    = StackProject senv
       , cradleCurrentDir = wdir
-      , cradleRootDir    = cabalDir
+      , cradleRootDir    = stackDir
       , cradleTempDir    = error "tmpDir"
       , cradleCabalFile  = Just cabalFile
       , cradleDistDir    = seDistDir senv
@@ -259,33 +261,32 @@ shouldLoadGhcEnvironment crdl =
 oldBuild :: ProjSetup 'V1
 oldBuild = ProjSetup
     { psDistDir   = \dir        -> DistDirV1 (dir </> "dist")
-    , psProjDir   = \cabal_file -> ProjLocV1CabalFile cabal_file
+    , psProjDir   = \cabal_file _ -> ProjLocV1CabalFile cabal_file
     }
 
 newBuild :: ProjSetup 'V2
 newBuild = ProjSetup
     { psDistDir   = \dir  -> DistDirV2 (dir </> "dist-newstyle")
-    , psProjDir   = \cabal_file -> ProjLocV2Dir (takeDirectory cabal_file)
+    , psProjDir   = \cabal_file _ -> ProjLocV2Dir (takeDirectory cabal_file)
     }
 
 stackBuild :: ProjSetup 'Stack
 stackBuild = ProjSetup
     { psDistDir   = \_dir  -> DistDirStack Nothing
-    , psProjDir   = \cabal_file -> ProjLocStackYaml ((takeDirectory cabal_file) </> "stack.yaml")
+    , psProjDir   = \_ rootDir -> ProjLocStackYaml (rootDir </> "stack.yaml")
     }
 
 -- ---------------------------------------------------------------------
 
 makeQueryEnv :: (IOish m, GmOut m)
-             => forall pt. ProjSetup (pt :: ProjType) -> FilePath -> m (QueryEnv (pt :: ProjType))
-makeQueryEnv ps cabalFile = do
-  let projdir = takeDirectory cabalFile
+             => forall pt. ProjSetup (pt :: ProjType) -> FilePath -> FilePath -> m (QueryEnv (pt :: ProjType))
+makeQueryEnv ps cabalFile rootDir = do
   -- crdl <- cradle
   -- progs <- patchStackPrograms crdl =<< (optPrograms <$> options)
   -- readProc <- gmReadProcess
   qeBare <- liftIO $ mkQueryEnv
-              (psProjDir ps $ cabalFile)
-              (psDistDir ps $ projdir)
+              ((psProjDir ps) cabalFile rootDir)
+              (psDistDir ps $ cabalFile)
   let qe = qeBare
              -- { qeReadProcess = \_ -> readProc
              -- , qePrograms = helperProgs progs

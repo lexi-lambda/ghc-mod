@@ -36,6 +36,7 @@ import Control.Monad
 import Control.Category ((.))
 import Data.Dynamic (toDyn, fromDynamic, Dynamic)
 import Data.List.NonEmpty ( NonEmpty(..), toList)
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as Map
 import Data.Maybe
 import Data.Monoid
@@ -59,6 +60,8 @@ import System.FilePath
 import System.Process
 import System.Exit
 import Prelude hiding ((.))
+
+import Debug.Trace
 
 import Paths_ghc_mod_core as GhcMod
 
@@ -192,7 +195,7 @@ getQueryEnv = do
 runCHQuery :: (IOish m, GmOut m, GmEnv m, Typeable pt)
            => ProjSetup (pt :: ProjType) -> Query (pt :: ProjType) b -> m b
 runCHQuery ps a = do
-  crdl <- cradle
+  crdl <- traceShowId <$> cradle
   progs <- patchStackPrograms crdl =<< (optPrograms <$> options)
   readProc <- gmReadProcess
   case cradleCabalFile crdl of
@@ -264,6 +267,18 @@ prepareCabalHelper ps = do
        qe <- getQueryEnv
        withCabal ps $ liftIO (prepare qe)
 
+getUnit :: (IOish m, GmEnv m, GmOut m, Typeable pt) => ProjSetup pt -> m (Unit pt)
+getUnit ps = do
+  crdl <- cradle
+  let cabalFile = cradleCabalFile crdl
+      filterUnit u
+        | Just ccf <- cabalFile
+        , CabalFile ucf <- uCabalFile u = ucf == ccf
+        | otherwise = True
+  allUnits <- traceShowId <$> runCHQuery ps projectUnits
+  let unit:_ = NE.filter filterUnit allUnits
+  return unit
+
 withAutogen :: (IOish m, GmEnv m, GmOut m, GmLog m, Typeable pt) => ProjSetup pt -> m a -> m a
 withAutogen ps action = do
     gmLog GmDebug "" $ strDoc "making sure autogen files exist"
@@ -271,7 +286,7 @@ withAutogen ps action = do
     let projdir = cradleRootDir crdl
         distdir = projdir </> cradleDistDir crdl
 
-    unit :| _ <- runCHQuery ps projectUnits
+    unit <- getUnit ps
     unitInfo <- runCHQuery ps $ unitInfo unit
     let (pkgName',_) = uiPackageId unitInfo
 
@@ -304,8 +319,7 @@ withCabal ps action = do
     cusPkgDb <- getCustomPkgDbStack
     (flgs, pkgDbStackOutOfSync) <- do
       if haveSetupConfig
-        then runCHQuery ps $ do
-          unit :| _ <- projectUnits
+        then getUnit ps >>= \unit -> runCHQuery ps $ do
           ui <- unitInfo unit
           -- flgs <- nonDefaultConfigFlags
           let flgs = uiNonDefaultConfigFlags ui

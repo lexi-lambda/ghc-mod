@@ -172,7 +172,7 @@ data Cradle = Cradle {
 data ProjSetup (pt :: ProjType) =
   ProjSetup
     { psDistDir   :: FilePath -> DistDir pt
-    , psProjDir   :: FilePath -> ProjLoc pt
+    , psProjDir   :: FilePath -> FilePath -> ProjLoc pt
     }
 
 data LoadGhcEnvironment = LoadGhcEnvironment
