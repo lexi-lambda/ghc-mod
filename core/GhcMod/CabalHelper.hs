@@ -276,7 +276,9 @@ getUnit ps = do
         , CabalFile ucf <- uCabalFile u = ucf == ccf
         | otherwise = True
   allUnits <- traceShowId <$> runCHQuery ps projectUnits
-  let unit:_ = NE.filter filterUnit allUnits
+  let unit = case NE.filter filterUnit allUnits of
+               x:_ -> x
+               _ -> error "getUnit: no units found matching the cabal file!"
   return unit
 
 withAutogen :: (IOish m, GmEnv m, GmOut m, GmLog m, Typeable pt) => ProjSetup pt -> m a -> m a
