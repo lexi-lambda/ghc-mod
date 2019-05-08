@@ -163,169 +163,169 @@ Library
   if impl(ghc < 8.4)
     Build-Depends:      ghc-syb-utils        < 0.3  && >= 0.2.3
 
-Executable ghc-mod
-  Default-Language:     Haskell2010
-  Main-Is:              GhcModMain.hs
-  Other-Modules:        Paths_ghc_mod
-                      , GhcMod.Exe.Options
-                      , GhcMod.Exe.Options.Commands
-                      , GhcMod.Exe.Version
-                      , GhcMod.Exe.Options.ShellParse
-  GHC-Options:          -Wall -fno-warn-deprecations -threaded
-  Default-Extensions:   ConstraintKinds, FlexibleContexts
-  HS-Source-Dirs:       src
-  X-Internal:           True
-  Build-Depends:
-                      -- See Note [GHC Boot libraries]
-                        directory
-                      , filepath
-                      , mtl
-                      , process
+-- Executable ghc-mod
+--   Default-Language:     Haskell2010
+--   Main-Is:              GhcModMain.hs
+--   Other-Modules:        Paths_ghc_mod
+--                       , GhcMod.Exe.Options
+--                       , GhcMod.Exe.Options.Commands
+--                       , GhcMod.Exe.Version
+--                       , GhcMod.Exe.Options.ShellParse
+--   GHC-Options:          -Wall -fno-warn-deprecations -threaded
+--   Default-Extensions:   ConstraintKinds, FlexibleContexts
+--   HS-Source-Dirs:       src
+--   X-Internal:           True
+--   Build-Depends:
+--                       -- See Note [GHC Boot libraries]
+--                         directory
+--                       , filepath
+--                       , mtl
+--                       , process
 
-                      , base                 < 4.14 && >= 4.6.0.1
-                      , fclabels             < 2.1  && >= 2.0
-                      , monad-control        < 1.1  && >= 1
-                      , optparse-applicative < 0.15 && >= 0.13.0.0
-                      , semigroups           < 0.19 && >= 0.10.0
-                      , split                < 0.3  && >= 0.2.2
+--                       , base                 < 4.14 && >= 4.6.0.1
+--                       , fclabels             < 2.1  && >= 2.0
+--                       , monad-control        < 1.1  && >= 1
+--                       , optparse-applicative < 0.15 && >= 0.13.0.0
+--                       , semigroups           < 0.19 && >= 0.10.0
+--                       , split                < 0.3  && >= 0.2.2
 
-                      , ghc                  < 8.7  && >= 7.8
-                      , ghc-mod
-                      , ghc-mod-core
-
-
-Executable ghc-modi
-  Default-Language:     Haskell2010
-  Main-Is:              GhcModi.hs
-  Other-Modules:        Paths_ghc_mod
-  GHC-Options:          -Wall -threaded -fno-warn-deprecations
-  if os(windows)
-      Cpp-Options:      -DWINDOWS
-  Default-Extensions:   ConstraintKinds, FlexibleContexts
-  HS-Source-Dirs:       ., src
-  Build-Depends:
-                      -- See Note [GHC Boot libraries]
-                        binary
-                      , deepseq
-                      , directory
-                      , filepath
-                      , old-time
-                      , process
-                      , time
-
-                      , base                 < 4.14 && >= 4.6.0.1
-
-                      , ghc-mod
-                      , ghc-mod-core
+--                       , ghc                  < 8.7  && >= 7.8
+--                       , ghc-mod
+--                       , ghc-mod-core
 
 
-Test-Suite doctest
-  Type:                 exitcode-stdio-1.0
-  Default-Language:     Haskell2010
-  HS-Source-Dirs:       test
-  Ghc-Options:          -Wall
-  Default-Extensions:   ConstraintKinds, FlexibleContexts
-  Main-Is:              doctests.hs
-  Build-Depends:        base                 < 4.14 && >= 4.6.0.1
-                      , doctest              < 0.17 && >= 0.11.3
+-- Executable ghc-modi
+--   Default-Language:     Haskell2010
+--   Main-Is:              GhcModi.hs
+--   Other-Modules:        Paths_ghc_mod
+--   GHC-Options:          -Wall -threaded -fno-warn-deprecations
+--   if os(windows)
+--       Cpp-Options:      -DWINDOWS
+--   Default-Extensions:   ConstraintKinds, FlexibleContexts
+--   HS-Source-Dirs:       ., src
+--   Build-Depends:
+--                       -- See Note [GHC Boot libraries]
+--                         binary
+--                       , deepseq
+--                       , directory
+--                       , filepath
+--                       , old-time
+--                       , process
+--                       , time
 
-Test-Suite spec
-  Default-Language:     Haskell2010
-  Default-Extensions:   ScopedTypeVariables, RecordWildCards, NamedFieldPuns,
-                        ConstraintKinds, FlexibleContexts,
-                        DataKinds, KindSignatures, TypeOperators, ViewPatterns
-  Main-Is:              Main.hs
-  Hs-Source-Dirs:       test, src
-  Ghc-Options:          -Wall -fno-warn-deprecations -threaded
-  Type:                 exitcode-stdio-1.0
-  Other-Modules:        Paths_ghc_mod
-                        Dir
-                        TestUtils
-                        GhcMod.Exe.Options.ShellParse
+--                       , base                 < 4.14 && >= 4.6.0.1
 
--- $ ls test/*Spec.hs | sed 's_^.*/\(.*\)\.hs$_\1_' | sort
-                        BrowseSpec
-                        CabalHelperSpec
-                        CaseSplitSpec
-                        CheckSpec
-                        CradleSpec
-                        CustomPackageDbSpec
-                        FileMappingSpec
-                        FindSpec
-                        FlagSpec
-                        GhcPkgSpec
-                        HomeModuleGraphSpec
-                        InfoSpec
-                        LangSpec
-                        LintSpec
-                        ListSpec
-                        MonadSpec
-                        PathsAndFilesSpec
-                        ShellParseSpec
-                        TargetSpec
-
-  Build-Depends:
-                      -- See Note [GHC Boot libraries]
-                        containers
-                      , directory
-                      , filepath
-                      , mtl
-                      , process
-                      , transformers
-
-                      , base                 < 4.14 && >= 4.6.0.1
-                      , fclabels             < 2.1  && >= 2.0
-                      , hspec                < 2.6  && >= 2.0.0
-                      , monad-journal        < 0.9  && >= 0.4
-                      , split                < 0.3  && >= 0.2.2
-                      , temporary            < 1.3  && >= 1.2.0.3
-
-  if impl(ghc < 7.8)
-    Build-Depends:      convertible          < 1.2  && >= 1.1.0.0
-  if impl(ghc >= 8.0)
-    Build-Depends:      ghc-boot
-
-  Build-Depends:
-                        cabal-helper         < 0.10  && >= 0.9.0.0
-                      , ghc                  < 8.7  && >= 7.8
-                      , ghc-mod
-                      , ghc-mod-core
+--                       , ghc-mod
+--                       , ghc-mod-core
 
 
-Test-Suite shelltest
-  Default-Language:     Haskell2010
-  Main-Is:              ShellTest.hs
-  Hs-Source-Dirs:       shelltest
-  Type:                 exitcode-stdio-1.0
-  if flag(shelltest)
-    Build-Tools:        shelltest
-  Build-Depends:        base                 < 4.14 && >= 4.6.0.1
-                      , process              < 1.5
-                      -- , shelltestrunner >= 1.3.5
-  if !flag(shelltest)
-    Buildable: False
+-- Test-Suite doctest
+--   Type:                 exitcode-stdio-1.0
+--   Default-Language:     Haskell2010
+--   HS-Source-Dirs:       test
+--   Ghc-Options:          -Wall
+--   Default-Extensions:   ConstraintKinds, FlexibleContexts
+--   Main-Is:              doctests.hs
+--   Build-Depends:        base                 < 4.14 && >= 4.6.0.1
+--                       , doctest              < 0.17 && >= 0.11.3
+
+-- Test-Suite spec
+--   Default-Language:     Haskell2010
+--   Default-Extensions:   ScopedTypeVariables, RecordWildCards, NamedFieldPuns,
+--                         ConstraintKinds, FlexibleContexts,
+--                         DataKinds, KindSignatures, TypeOperators, ViewPatterns
+--   Main-Is:              Main.hs
+--   Hs-Source-Dirs:       test, src
+--   Ghc-Options:          -Wall -fno-warn-deprecations -threaded
+--   Type:                 exitcode-stdio-1.0
+--   Other-Modules:        Paths_ghc_mod
+--                         Dir
+--                         TestUtils
+--                         GhcMod.Exe.Options.ShellParse
+
+-- -- $ ls test/*Spec.hs | sed 's_^.*/\(.*\)\.hs$_\1_' | sort
+--                         BrowseSpec
+--                         CabalHelperSpec
+--                         CaseSplitSpec
+--                         CheckSpec
+--                         CradleSpec
+--                         CustomPackageDbSpec
+--                         FileMappingSpec
+--                         FindSpec
+--                         FlagSpec
+--                         GhcPkgSpec
+--                         HomeModuleGraphSpec
+--                         InfoSpec
+--                         LangSpec
+--                         LintSpec
+--                         ListSpec
+--                         MonadSpec
+--                         PathsAndFilesSpec
+--                         ShellParseSpec
+--                         TargetSpec
+
+--   Build-Depends:
+--                       -- See Note [GHC Boot libraries]
+--                         containers
+--                       , directory
+--                       , filepath
+--                       , mtl
+--                       , process
+--                       , transformers
+
+--                       , base                 < 4.14 && >= 4.6.0.1
+--                       , fclabels             < 2.1  && >= 2.0
+--                       , hspec                < 2.6  && >= 2.0.0
+--                       , monad-journal        < 0.9  && >= 0.4
+--                       , split                < 0.3  && >= 0.2.2
+--                       , temporary            < 1.3  && >= 1.2.0.3
+
+--   if impl(ghc < 7.8)
+--     Build-Depends:      convertible          < 1.2  && >= 1.1.0.0
+--   if impl(ghc >= 8.0)
+--     Build-Depends:      ghc-boot
+
+--   Build-Depends:
+--                         cabal-helper         < 0.10  && >= 0.9.0.0
+--                       , ghc                  < 8.7  && >= 7.8
+--                       , ghc-mod
+--                       , ghc-mod-core
 
 
-Benchmark criterion
-  Type:                 exitcode-stdio-1.0
-  Default-Language:     Haskell2010
-  Default-Extensions:   ScopedTypeVariables, RecordWildCards, NamedFieldPuns,
-                        ConstraintKinds, FlexibleContexts,
-                        DataKinds, KindSignatures, TypeOperators, ViewPatterns
-  HS-Source-Dirs:       bench, test
-  Main-Is:              Bench.hs
-  Build-Depends:
-                      -- See Note [GHC Boot libraries]
-                        directory
-                      , filepath
+-- Test-Suite shelltest
+--   Default-Language:     Haskell2010
+--   Main-Is:              ShellTest.hs
+--   Hs-Source-Dirs:       shelltest
+--   Type:                 exitcode-stdio-1.0
+--   if flag(shelltest)
+--     Build-Tools:        shelltest
+--   Build-Depends:        base                 < 4.14 && >= 4.6.0.1
+--                       , process              < 1.5
+--                       -- , shelltestrunner >= 1.3.5
+--   if !flag(shelltest)
+--     Buildable: False
 
-                      , base                 < 4.14 && >= 4.6.0.1
-                      , criterion            < 1.2  && >= 1.1.1.0
-                      , temporary            < 1.3  && >= 1.2.0.3
 
-                      , ghc-mod
-                      , ghc-mod-core
-  Buildable:          False
+-- Benchmark criterion
+--   Type:                 exitcode-stdio-1.0
+--   Default-Language:     Haskell2010
+--   Default-Extensions:   ScopedTypeVariables, RecordWildCards, NamedFieldPuns,
+--                         ConstraintKinds, FlexibleContexts,
+--                         DataKinds, KindSignatures, TypeOperators, ViewPatterns
+--   HS-Source-Dirs:       bench, test
+--   Main-Is:              Bench.hs
+--   Build-Depends:
+--                       -- See Note [GHC Boot libraries]
+--                         directory
+--                       , filepath
+
+--                       , base                 < 4.14 && >= 4.6.0.1
+--                       , criterion            < 1.2  && >= 1.1.1.0
+--                       , temporary            < 1.3  && >= 1.2.0.3
+
+--                       , ghc-mod
+--                       , ghc-mod-core
+--   Buildable:          False
 
 Flag shelltest
   Description: Enable/disable shelltest test-suite

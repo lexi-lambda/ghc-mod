@@ -16,20 +16,33 @@
 
 {-# LANGUAGE ExistentialQuantification #-}
 module GhcMod.Error (
-    GhcModError(..)
-  , GmError
-  , gmeDoc
+  --   GhcModError(..)
+  -- , GmError
+    gmeDoc
   , ghcExceptionDoc
-  , liftMaybe
-  , overrideError
-  , modifyError
-  , modifyError'
-  , modifyGmError
-  , tryFix
-  , GHandler(..)
+  -- , liftMaybe
+  -- , overrideError
+  -- , modifyError
+  -- , modifyError'
+  -- , modifyGmError
+  -- , tryFix
+  -- , GHandler(..)
   , gcatches
-  , module Control.Monad.Error
-  , module Control.Exception
+
+  -- * Re-exported
+  -- , module Control.Monad.Error
+  -- , module Control.Exception
+  , GHandler(..)
+  , when
+  , msum
+  , mzero
+  , filterM
+  , throwError
+  , liftM
+  , (>=>)
+  , forM_
+  , void
+  , runErrorT
   ) where
 
 import Control.Arrow hiding ((<+>))

@@ -4,7 +4,7 @@ module GhcMod (
   -- * Cradle
     Cradle(..)
   , Project(..)
-  , findCradle
+  -- , findCradle
   -- * Options
   , Options(..)
   , LineSeparator(..)
@@ -13,8 +13,8 @@ module GhcMod (
   , defaultOptions
   -- * Logging
   , GmLogLevel
-  , increaseLogLevel
-  , decreaseLogLevel
+  -- , increaseLogLevel
+  -- , decreaseLogLevel
   , gmSetLogLevel
   , gmLog
   -- * Types
@@ -64,9 +64,9 @@ module GhcMod (
   , gmPutStrLn
   , gmErrStrLn
   -- * FileMapping
-  , loadMappedFile
+  -- , loadMappedFile
   , loadMappedFileSource
-  , unloadMappedFile
+  -- , unloadMappedFile
   ) where
 
 import GhcMod.Exe.Boot

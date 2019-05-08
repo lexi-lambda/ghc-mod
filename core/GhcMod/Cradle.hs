@@ -1,14 +1,14 @@
 {-# LANGUAGE CPP #-}
 module GhcMod.Cradle
-  ( findCradle
-  , findCradle'
+  (--  findCradle
+    findCradle'
   , findCradleNoLog
-  , findSpecCradle
+  -- , findSpecCradle
   , cleanupCradle
   , shouldLoadGhcEnvironment
 
-  -- * for @spec@
-  , plainCradle
+  -- -- * for @spec@
+  -- , plainCradle
   ) where
 
 import GhcMod.PathsAndFiles

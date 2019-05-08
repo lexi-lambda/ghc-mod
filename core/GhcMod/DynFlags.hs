@@ -2,7 +2,19 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE CPP #-}
 
-module GhcMod.DynFlags where
+module GhcMod.DynFlags
+  (
+    withDynFlags
+  , addCmdOpts
+  , eqDynFlags
+  , setEmptyLogger
+  , setDebugLogger
+  , setHscNothing
+  , setHscInterpreted
+  , deferErrors
+  , setNoWarningFlags
+  , setAllWarningFlags
+  ) where
 
 import Control.Applicative
 import Control.Monad

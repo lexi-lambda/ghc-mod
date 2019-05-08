@@ -17,11 +17,27 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module GhcMod.Logging (
-    module GhcMod.Logging
-  , module GhcMod.Pretty
-  , GmLogLevel(..)
-  , module Data.Monoid
-  , module Pretty
+  --   module GhcMod.Logging
+  -- , module GhcMod.Pretty
+  -- , GmLogLevel(..)
+  -- , module Data.Monoid
+  -- , module Pretty
+    text
+  , (<+>)
+  , ($$)
+  , (<+>:)
+  , parens
+  , strDoc
+  , showToDoc
+  , nest
+  --
+  , renderGm
+  , gmLog
+  , gmVomit
+  , gmSetLogLevel
+  , gmAppendLogQuiet
+ 
+
   ) where
 
 import Control.Applicative hiding (empty)

@@ -47,6 +47,7 @@ module GhcModCore (
   , loadMappedFileSource
   , getMMappedFiles
   , mkRevRedirMapFunc
+  , withMappedFile
   -- * HIE integration utilities
   , getModulesGhc'
 
@@ -60,10 +61,13 @@ import GhcMod.Cradle ( findCradle')
 import GhcMod.DynFlags ( withDynFlags )
 import GhcMod.Error ( gcatches, GHandler(..), ghcExceptionDoc )
 import GhcMod.FileMapping ( loadMappedFileSource )
+
 import GhcMod.Logging ( renderGm )
 import GhcMod.Monad ( GmState(..), cradle, options, GmLog(..), GmEnv(..), GmlT(..), GmOut(..), gmlGetSession, gmlSetSession, GhcModT, runGhcModT, getMMappedFiles )
 import GhcMod.ModuleLoader ( getModulesGhc' )
 import GhcMod.Target ( cabalResolvedComponents )
-import GhcMod.Types ( GmGhcSession(..), GhcModState(..), GmModuleGraph(..),gmcHomeModuleGraph, Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..) )
-import GhcMod.Utils ( makeAbsolute', mkRevRedirMapFunc )
+import GhcMod.Types ( GmGhcSession(..), GhcModState(..), GmModuleGraph(..),gmcHomeModuleGraph, Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..)
+                    , GhcModError(..) )
+import GhcMod.Utils ( makeAbsolute', mkRevRedirMapFunc
+                    , withMappedFile)
 import qualified GhcMod.Gap as Gap ( mkErrStyle', GhcPs, GhcRn, GhcTc )

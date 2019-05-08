@@ -1,9 +1,9 @@
 module GhcMod.FileMapping
-    ( loadMappedFile
-    , loadMappedFileSource
-    , unloadMappedFile
+    ( -- loadMappedFile
+      loadMappedFileSource
+    -- , unloadMappedFile
     , mapFile
-    , fileModSummaryWithMapping
+    , fileModSummaryWithMapping -- For GhcMod.Exe.CaseSplit
     ) where
 
 import GhcMod.Types
