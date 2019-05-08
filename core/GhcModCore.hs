@@ -1,55 +1,69 @@
 -- | The ghc-mod library.
 
 module GhcModCore (
+  -- * Used in hie-plugin-api
+    withDynFlags
+  , gcatches
+  , GHandler(..)
+  , ghcExceptionDoc
+  , Gap.mkErrStyle'
+  , renderGm
+  , cabalResolvedComponents
+  , GmState(..)
+  , GmGhcSession(..)
+  , GhcModState(..)
+  , GmModuleGraph(..)
+  , gmcHomeModuleGraph
+
   -- * Cradle
-    Cradle(..)
-  , Project(..)
-  , findCradle
+  , Cradle(..)
+  , cradle
+  , findCradle'
   -- * Options
   , Options(..)
-  , LineSeparator(..)
-  , OutputStyle(..)
-  , FileMapping(..)
+  , options
   , defaultOptions
   -- * Logging
-  , GmLogLevel
-  , increaseLogLevel
-  , decreaseLogLevel
-  , gmSetLogLevel
-  , gmLog
-  -- * Types
-  , ModuleString
-  , Expression(..)
-  , GhcPkgDb
-  -- , Symbol
-  -- , SymbolDb
+  , GmLogLevel(..)
+  , GmLog(..)
+  -- -- * Types
+  , GmEnv(..)
+  , GmlT(..)
+  , GmOut(..)
+  , GhcModEnv(..)
+  , MonadIO(..)
+  , gmlGetSession
+  , gmlSetSession
   , GhcModError(..)
   -- * Monad Types
   , GhcModT
   , IOish
   -- * Monad utilities
   , runGhcModT
-  , withOptions
-  , dropSession
   -- * Output
-  , gmPutStr
-  , gmErrStr
-  , gmPutStrLn
-  , gmErrStrLn
+  , OutputOpts(..)
   -- * FileMapping
-  , loadMappedFile
+  , makeAbsolute'
   , loadMappedFileSource
-  , unloadMappedFile
+  , getMMappedFiles
+  , mkRevRedirMapFunc
   -- * HIE integration utilities
-  , getModulesGhc
   , getModulesGhc'
+
+  , Gap.GhcPs
+  , Gap.GhcRn
+  , Gap.GhcTc
+
   ) where
 
-import GhcMod.Cradle
-import GhcMod.FileMapping
-import GhcMod.Logging
-import GhcMod.Monad
-import GhcMod.ModuleLoader
-import GhcMod.Output
-import GhcMod.Target
-import GhcMod.Types
+import GhcMod.Cradle ( findCradle')
+import GhcMod.DynFlags ( withDynFlags )
+import GhcMod.Error ( gcatches, GHandler(..), ghcExceptionDoc )
+import GhcMod.FileMapping ( loadMappedFileSource )
+import GhcMod.Logging ( renderGm )
+import GhcMod.Monad ( GmState(..), cradle, options, GmLog(..), GmEnv(..), GmlT(..), GmOut(..), gmlGetSession, gmlSetSession, GhcModT, runGhcModT, getMMappedFiles )
+import GhcMod.ModuleLoader ( getModulesGhc' )
+import GhcMod.Target ( cabalResolvedComponents )
+import GhcMod.Types ( GmGhcSession(..), GhcModState(..), GmModuleGraph(..),gmcHomeModuleGraph, Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..) )
+import GhcMod.Utils ( makeAbsolute', mkRevRedirMapFunc )
+import qualified GhcMod.Gap as Gap ( mkErrStyle', GhcPs, GhcRn, GhcTc )
