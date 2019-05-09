@@ -15,7 +15,22 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 {-# LANGUAGE CPP, ViewPatterns, NamedFieldPuns, RankNTypes #-}
-module GhcMod.Target where
+module GhcMod.Target
+  (
+    loadTargets
+  , targetGhcOptions
+  , cabalResolvedComponents
+  , runGmlT
+  , runGmlT'
+  , runGmlTWith
+  , runGmlTWith'
+  , runGmPkgGhc
+
+  , packageGhcOptions -- Exe.Debug
+  , moduleComponents -- Exe.Debug
+  , pickComponent -- Exe.Debug
+  , findCandidates -- Exe.Debug
+  ) where
 
 import Control.Arrow
 import Control.Applicative

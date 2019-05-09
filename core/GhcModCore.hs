@@ -54,20 +54,29 @@ module GhcModCore (
   , Gap.GhcPs
   , Gap.GhcRn
   , Gap.GhcTc
-
+  , Gap.listVisibleModuleNames
+  , runLightGhc
+  , defaultLintOpts
+  , Expression(..)
+  , pretty
+  , LightGhc(..)
   ) where
 
 import GhcMod.Cradle ( findCradle')
 import GhcMod.DynFlags ( withDynFlags )
 import GhcMod.Error ( gcatches, GHandler(..), ghcExceptionDoc )
 import GhcMod.FileMapping ( loadMappedFileSource )
-
 import GhcMod.Logging ( renderGm )
-import GhcMod.Monad ( GmState(..), cradle, options, GmLog(..), GmEnv(..), GmlT(..), GmOut(..), gmlGetSession, gmlSetSession, GhcModT, runGhcModT, getMMappedFiles )
+
+import GhcMod.Monad ( runGhcModT )
+import GhcMod.Monad.Types ( GmState(..), cradle, options, GmLog(..), GmEnv(..), GmlT(..), GmOut(..), gmlGetSession, gmlSetSession, GhcModT, getMMappedFiles, LightGhc(..) )
+
 import GhcMod.ModuleLoader ( getModulesGhc' )
 import GhcMod.Target ( cabalResolvedComponents )
 import GhcMod.Types ( GmGhcSession(..), GhcModState(..), GmModuleGraph(..),gmcHomeModuleGraph, Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..)
-                    , GhcModError(..) )
+                    , GhcModError(..), defaultLintOpts, Expression(..) )
 import GhcMod.Utils ( makeAbsolute', mkRevRedirMapFunc
                     , withMappedFile)
-import qualified GhcMod.Gap as Gap ( mkErrStyle', GhcPs, GhcRn, GhcTc )
+import qualified GhcMod.Gap as Gap ( mkErrStyle', GhcPs, GhcRn, GhcTc, listVisibleModuleNames )
+import GhcMod.LightGhc ( runLightGhc )
+import GhcMod.SrcUtils ( pretty )

@@ -4,8 +4,8 @@
 -- | Uses GHC hooks to load a TypecheckedModule
 
 module GhcMod.ModuleLoader
-  ( getModulesGhc
-  , getModulesGhc'
+  ( -- getModulesGhc
+    getModulesGhc'
   ) where
 
 import           Control.Monad.IO.Class
@@ -16,6 +16,7 @@ import           Data.IORef
 import qualified GhcMod.Monad                      as GM
 import qualified GhcMod.Target                     as GM
 import qualified GhcMod.Types                      as GM
+import qualified GhcMod.Monad.Types                as GM
 
 import           GHC                               (TypecheckedModule, ParsedModule)
 import qualified GHC

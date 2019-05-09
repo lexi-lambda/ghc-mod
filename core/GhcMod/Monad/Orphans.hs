@@ -20,14 +20,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module GhcMod.Monad.Orphans where
 
-#include "Compat.hs_h"
-
 import GhcMod.Types
 import GhcMod.Monad.Newtypes
 
-#if DIFFERENT_MONADIO
-import qualified MonadUtils as GHC (MonadIO(..))
-#endif
 import qualified Control.Monad.IO.Class as MTL
 
 import Control.Monad.Reader (ReaderT(..))
@@ -38,23 +33,6 @@ import Control.Monad.Error (Error(..), ErrorT(..))
 
 --------------------------------------------------
 -- Miscellaneous instances
-
-#if DIFFERENT_MONADIO
-instance MTL.MonadIO m => GHC.MonadIO (ReaderT x m) where
-    liftIO = MTL.liftIO
-instance MTL.MonadIO m => GHC.MonadIO (StateT x m) where
-    liftIO = MTL.liftIO
-instance (Error e, MTL.MonadIO m) => GHC.MonadIO (ErrorT e m) where
-    liftIO = MTL.liftIO
-instance MTL.MonadIO m => GHC.MonadIO (JournalT x m) where
-    liftIO = MTL.liftIO
-instance MTL.MonadIO m => GHC.MonadIO (MaybeT m) where
-    liftIO = MTL.liftIO
-deriving instance MTL.MonadIO m => GHC.MonadIO (GmOutT m)
-deriving instance MTL.MonadIO m => GHC.MonadIO (GmT m)
-deriving instance MTL.MonadIO m => GHC.MonadIO (GmlT m)
-deriving instance GHC.MonadIO LightGhc
-#endif
 
 deriving instance MTL.MonadIO m => MTL.MonadIO (GmOutT m)
 deriving instance MTL.MonadIO m => MTL.MonadIO (GmT m)

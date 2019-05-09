@@ -20,8 +20,6 @@
 
 module GhcMod.Monad.Newtypes where
 
-#include "Compat.hs_h"
-
 import GhcMod.Types
 
 import GHC

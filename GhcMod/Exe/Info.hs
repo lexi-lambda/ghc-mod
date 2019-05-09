@@ -18,6 +18,7 @@ import GhcMod.DynFlags
 import GhcMod.Gap
 import GhcMod.Logging
 import GhcMod.Monad
+import GhcMod.Monad.Types
 import GhcMod.SrcUtils
 import GhcMod.Types
 import GhcMod.Utils (mkRevRedirMapFunc)

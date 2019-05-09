@@ -36,7 +36,6 @@ module GhcMod.Logging (
   , gmVomit
   , gmSetLogLevel
   , gmAppendLogQuiet
- 
 
   ) where
 
@@ -62,18 +61,20 @@ gmSetLogLevel :: GmLog m => GmLogLevel -> m ()
 gmSetLogLevel level =
     gmlJournal $ GhcModLog (Just level) (Last Nothing) []
 
+{-
 gmGetLogLevel :: forall m. GmLog m => m GmLogLevel
 gmGetLogLevel = do
   GhcModLog { gmLogLevel = mlevel } <-  gmlHistory
   case mlevel of
     Just level -> return level
     _          -> error "mempty value for GhcModLog must use a Just value"
-
+-}
+{-
 gmSetDumpLevel :: GmLog m => Bool -> m ()
 gmSetDumpLevel level =
     gmlJournal $ GhcModLog Nothing (Last (Just level)) []
-
-
+-}
+{-
 increaseLogLevel :: GmLogLevel -> GmLogLevel
 increaseLogLevel l | l == maxBound = l
 increaseLogLevel l = succ l
@@ -81,7 +82,7 @@ increaseLogLevel l = succ l
 decreaseLogLevel :: GmLogLevel -> GmLogLevel
 decreaseLogLevel l | l == minBound = l
 decreaseLogLevel l = pred l
-
+-}
 -- |
 -- >>> Just GmDebug <= Nothing
 -- False
@@ -124,13 +125,13 @@ gmVomit filename doc content = do
        liftIO $ writeFile (dir </> filename) content
 
 
-newtype LogDiscardT m a = LogDiscardT { runLogDiscard :: m a }
-    deriving (Functor, Applicative, Monad)
+-- newtype LogDiscardT m a = LogDiscardT { runLogDiscard :: m a }
+--     deriving (Functor, Applicative, Monad)
 
-instance MonadTrans LogDiscardT where
-    lift = LogDiscardT
+-- instance MonadTrans LogDiscardT where
+--     lift = LogDiscardT
 
-instance Monad m => GmLog (LogDiscardT m) where
-    gmlJournal = const $ return ()
-    gmlHistory = return mempty
-    gmlClear = return ()
+-- instance Monad m => GmLog (LogDiscardT m) where
+--     gmlJournal = const $ return ()
+--     gmlHistory = return mempty
+--     gmlClear = return ()

@@ -62,6 +62,7 @@ import GhcMod.Error
 import GhcMod.Logger
 import GhcMod.Logging
 import GhcMod.Monad
+import GhcMod.Monad.Types
 import GhcMod.Types
 import GhcMod.Utils
 import GhcMod.World

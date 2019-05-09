@@ -6,6 +6,7 @@ import GhcMod.Logger (checkErrorPrefix)
 import GhcMod.Convert
 import GhcMod.Types
 import GhcMod.Monad
+import GhcMod.Monad.Types
 import Language.Haskell.HLint3
 
 import GhcMod.Utils (withMappedFile)

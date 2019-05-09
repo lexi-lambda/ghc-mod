@@ -24,6 +24,7 @@ import GhcMod.Convert
 import GhcMod.DynFlags
 import qualified GhcMod.Gap as Gap
 import GhcMod.Monad
+import GhcMod.Monad.Types
 import GhcMod.SrcUtils
 import GhcMod.Doc
 import GhcMod.Logging
