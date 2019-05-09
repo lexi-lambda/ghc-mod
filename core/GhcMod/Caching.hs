@@ -15,8 +15,10 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {-# LANGUAGE CPP, OverloadedStrings #-}
 module GhcMod.Caching (
-    module GhcMod.Caching
-  , module GhcMod.Caching.Types
+    Cached(..)
+  , ChCacheData(..)
+  , cached
+  , invalidatingInputFiles
   ) where
 
 import Control.Arrow (first)

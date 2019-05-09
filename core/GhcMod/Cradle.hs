@@ -29,7 +29,6 @@ import System.Environment
 import Prelude
 import Control.Monad.Trans.Journal (runJournalT)
 import Distribution.Helper (runQuery, mkQueryEnv, compilerVersion, distDir)
--- import Distribution.System (buildPlatform)
 import Data.List (intercalate)
 import Data.Version (Version(..))
 

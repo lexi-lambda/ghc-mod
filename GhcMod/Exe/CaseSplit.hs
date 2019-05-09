@@ -1,8 +1,7 @@
 {-# LANGUAGE CPP #-}
 
 module GhcMod.Exe.CaseSplit (
-    splits
-  , splits'
+    splits'
   , SplitResult(..)
   ) where
 
@@ -20,17 +19,18 @@ import qualified TyCon as Ty
 import qualified Type as Ty
 import Exception
 
-import GhcMod.Convert
-import GhcMod.DynFlags
-import qualified GhcMod.Gap as Gap
-import GhcMod.Monad
-import GhcMod.Monad.Types
-import GhcMod.SrcUtils
-import GhcMod.Doc
-import GhcMod.Logging
-import GhcMod.Types
+import GhcMod.Convert ( whenFound', emptyResult )
+import GhcMod.DynFlags ( deferErrors )
+import qualified GhcMod.Gap as Gap ( getType, getSrcSpan, GhcTc )
+import GhcMod.Monad ( runGmlT' )
+import GhcMod.Monad.Types ( IOish, GhcModT, GmlT(..), cradle, outputOpts, GmLogLevel(..), MonadIO(..) )
+import GhcMod.SrcUtils ( showName, listifySpans )
+import GhcMod.Doc ( getStyle )
+import GhcMod.Logging ( gmLog, text, ($$), nest, showToDoc )
+import GhcMod.Types ( cradleCurrentDir )
 import GhcMod.Utils (withMappedFile)
 import GhcMod.FileMapping (fileModSummaryWithMapping)
+
 import Control.DeepSeq
 
 ----------------------------------------------------------------

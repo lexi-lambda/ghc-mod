@@ -104,21 +104,9 @@ Library
   HS-Source-Dirs:       .
   Exposed-Modules:
                         GhcMod
-                        -- GhcMod.Exe.Boot
-                        -- GhcMod.Exe.Browse
                         GhcMod.Exe.CaseSplit
-                        -- GhcMod.Exe.Check
-                        -- GhcMod.Exe.Debug
-                        -- GhcMod.Exe.FillSig
-                        -- GhcMod.Exe.Find
-                        -- GhcMod.Exe.Flag
                         GhcMod.Exe.Info
-                        -- GhcMod.Exe.Internal
-                        -- GhcMod.Exe.Lang
                         GhcMod.Exe.Lint
-                        -- GhcMod.Exe.Modules
-                        -- GhcMod.Exe.PkgDoc
-                        -- GhcMod.Exe.Test
   Other-Modules:        Paths_ghc_mod
   Build-Depends:
                       -- See Note [GHC Boot libraries]

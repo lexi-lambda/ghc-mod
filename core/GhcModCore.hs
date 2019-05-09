@@ -14,52 +14,47 @@ module GhcModCore (
   , GhcModState(..)
   , GmModuleGraph(..)
   , gmcHomeModuleGraph
-
-  -- * Cradle
+  , getModulesGhc'
   , Cradle(..)
   , cradle
-  , findCradle'
-  -- * Options
+  , GhcModT
+  , runGhcModT
+  , GmlT(..)
+  , gmlGetSession
+  , gmlSetSession
+  , MonadIO(..)
+  , GmLogLevel(..)
   , Options(..)
   , options
   , defaultOptions
-  -- * Logging
-  , GmLogLevel(..)
-  , GmLog(..)
-  -- -- * Types
+  , OutputOpts(..)
+  , findCradle'
   , GmEnv(..)
-  , GmlT(..)
+  , GmLog(..)
   , GmOut(..)
   , GhcModEnv(..)
-  , MonadIO(..)
-  , gmlGetSession
-  , gmlSetSession
-  , GhcModError(..)
-  -- * Monad Types
-  , GhcModT
-  , IOish
-  -- * Monad utilities
-  , runGhcModT
-  -- * Output
-  , OutputOpts(..)
-  -- * FileMapping
-  , makeAbsolute'
-  , loadMappedFileSource
-  , getMMappedFiles
   , mkRevRedirMapFunc
-  , withMappedFile
-  -- * HIE integration utilities
-  , getModulesGhc'
+  , makeAbsolute'
+  , getMMappedFiles
+  , IOish
+  , GhcModError(..)
 
   , Gap.GhcPs
   , Gap.GhcRn
   , Gap.GhcTc
+
+-- ---------------------------------------------
+
+  -- * HIE integration utilities
+
+  , loadMappedFileSource
+  , withMappedFile
   , Gap.listVisibleModuleNames
-  , runLightGhc
   , defaultLintOpts
   , Expression(..)
   , pretty
   , LightGhc(..)
+  , runLightGhc
   ) where
 
 import GhcMod.Cradle ( findCradle')

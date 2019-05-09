@@ -1,6 +1,5 @@
 module GhcMod.Exe.Info (
     info
-  , types
   ) where
 
 import Data.Function (on)

@@ -1,4 +1,7 @@
-module GhcMod.Exe.Lint where
+module GhcMod.Exe.Lint
+  (
+    lint
+  ) where
 
 import Exception (ghandle)
 import Control.Exception (SomeException(..))

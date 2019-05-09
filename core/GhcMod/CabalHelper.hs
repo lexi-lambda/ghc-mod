@@ -16,15 +16,16 @@
 
 {-# LANGUAGE CPP #-}
 module GhcMod.CabalHelper
-  ( getComponents
+  (
+    getComponents
   , getGhcMergedPkgOptions
   , getCabalPackageDbStack
-  , prepareCabalHelper
+  -- , prepareCabalHelper
   , withAutogen
-  , withCabal
+  -- , withCabal
 
-  , runCHQuery
-  , packageId
+  -- , runCHQuery
+  -- , packageId
   ) where
 
 import Control.Applicative
@@ -122,11 +123,11 @@ runCHQuery a = do
   runQuery qe a
 
 
-prepareCabalHelper :: (IOish m, GmEnv m, GmOut m, GmLog m) => m ()
-prepareCabalHelper = do
-  crdl <- cradle
-  when (isCabalHelperProject $ cradleProject crdl) $
-       withCabal $ prepare =<< getQueryEnv
+-- prepareCabalHelper :: (IOish m, GmEnv m, GmOut m, GmLog m) => m ()
+-- prepareCabalHelper = do
+--   crdl <- cradle
+--   when (isCabalHelperProject $ cradleProject crdl) $
+--        withCabal $ prepare =<< getQueryEnv
 
 withAutogen :: (IOish m, GmEnv m, GmOut m, GmLog m) => m a -> m a
 withAutogen action = do
