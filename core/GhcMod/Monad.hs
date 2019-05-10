@@ -16,8 +16,6 @@
 
 {-# LANGUAGE CPP #-}
 module GhcMod.Monad (
-  --   runGmOutT
-  -- , runGmOutT'
     runGhcModT
   , runGhcModT' -- Exe.Internal
   , hoistGhcModT -- Exe.Internal
@@ -25,9 +23,6 @@ module GhcMod.Monad (
   , runGmlT' -- Exe.CaseSplit
   , runGmlTWith -- Exe.Check
   , runGmPkgGhc -- Exe.Browse
-  -- , withGhcModEnv
-  -- , withGhcModEnv'
-  -- , module GhcMod.Monad.Types
   ) where
 
 import GhcMod.Types

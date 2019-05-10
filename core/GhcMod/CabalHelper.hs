@@ -39,6 +39,7 @@ import Data.Traversable
 import Distribution.Helper hiding (Programs(..))
 import qualified Distribution.Helper as CH
 import qualified GhcMod.Types as T
+import GhcMod.Caching
 import GhcMod.Types
 import GhcMod.Monad.Types
 import GhcMod.Utils
@@ -50,6 +51,7 @@ import GhcMod.Stack
 import System.FilePath
 import System.Process
 import System.Exit
+import GhcProject.Types
 import Prelude hiding ((.))
 
 import Paths_ghc_mod_core as GhcMod

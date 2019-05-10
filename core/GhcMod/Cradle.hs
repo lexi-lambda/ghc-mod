@@ -28,9 +28,9 @@ import System.FilePath
 import System.Environment
 import Prelude
 import Control.Monad.Trans.Journal (runJournalT)
-import Distribution.Helper (runQuery, mkQueryEnv, compilerVersion, distDir)
-import Data.List (intercalate)
-import Data.Version (Version(..))
+import Distribution.Helper (runQuery, mkQueryEnv, distDir)
+-- import Data.List (intercalate)
+-- import Data.Version (Version(..))
 
 ----------------------------------------------------------------
 
@@ -54,22 +54,6 @@ findCradle' Programs { stackProgram, cabalProgram } dir = run $
          ]
  where run a = fillTempDir =<< (fromJustNote "findCradle'" <$> runMaybeT a)
 
-findSpecCradle ::
-    (GmLog m, IOish m, GmOut m) => Programs -> FilePath -> m Cradle
-findSpecCradle Programs { stackProgram, cabalProgram } dir = do
-    let cfs = [ stackCradleSpec stackProgram
-              , cabalCradle cabalProgram
-              , sandboxCradle
-              ]
-    cs <- catMaybes <$> mapM (runMaybeT . ($ dir)) cfs
-    gcs <- filterM isNotGmCradle cs
-    fillTempDir =<< case gcs of
-                      [] -> fromJust <$> runMaybeT (plainCradle dir)
-                      c:_ -> return c
- where
-   isNotGmCradle crdl =
-     liftIO $ not <$> doesFileExist (cradleRootDir crdl </> "ghc-mod.cabal")
-
 cleanupCradle :: Cradle -> IO ()
 cleanupCradle crdl = removeDirectoryRecursive $ cradleTempDir crdl
 
@@ -77,16 +61,6 @@ fillTempDir :: IOish m => Cradle -> m Cradle
 fillTempDir crdl = do
   tmpDir <- liftIO $ newTempDir (cradleRootDir crdl)
   return crdl { cradleTempDir = tmpDir }
-
--- run :: Monad m => QueryEnv -> Maybe SomeLocalBuildInfo -> Query m a -> m a
--- run e s action = flip runReaderT e (flip evalStateT s (unQuery action))
-
--- -- | @runQuery env query@. Run a 'Query' under a given 'QueryEnv'.
--- runQuery :: Monad m
---           => QueryEnv
---           -> Query m a
---           -> m a
--- runQuery qe action = run qe Nothing action
 
 cabalCradle ::
     (IOish m, GmLog m, GmOut m) => FilePath -> FilePath -> MaybeT m Cradle
@@ -176,19 +150,19 @@ stackCradle stackProg wdir = do
       , cradleDistDir    = seDistDir senv
       }
 
-stackCradleSpec ::
-    (IOish m, GmLog m, GmOut m) => FilePath -> FilePath -> MaybeT m Cradle
-stackCradleSpec stackProg wdir = do
-  crdl <- stackCradle stackProg wdir
-  case crdl of
-    Cradle { cradleProject = StackProject StackEnv { seDistDir } } -> do
-      b <- isGmDistDir seDistDir
-      when b mzero
-      return crdl
-    _ -> error "stackCradleSpec"
- where
-   isGmDistDir dir =
-       liftIO $ not <$> doesFileExist (dir </> ".." </> "ghc-mod.cabal")
+-- stackCradleSpec ::
+--     (IOish m, GmLog m, GmOut m) => FilePath -> FilePath -> MaybeT m Cradle
+-- stackCradleSpec stackProg wdir = do
+--   crdl <- stackCradle stackProg wdir
+--   case crdl of
+--     Cradle { cradleProject = StackProject StackEnv { seDistDir } } -> do
+--       b <- isGmDistDir seDistDir
+--       when b mzero
+--       return crdl
+--     _ -> error "stackCradleSpec"
+--  where
+--    isGmDistDir dir =
+--        liftIO $ not <$> doesFileExist (dir </> ".." </> "ghc-mod.cabal")
 
 sandboxCradle :: (IOish m, GmLog m, GmOut m) => FilePath -> MaybeT m Cradle
 sandboxCradle wdir = do

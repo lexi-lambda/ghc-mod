@@ -14,7 +14,13 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-module GhcMod.Stack where
+module GhcMod.Stack
+  (
+    getStackEnv
+  , patchStackPrograms
+  , getStackGhcPath
+  , getStackGhcPkgPath
+  ) where
 
 import Safe
 import Control.Applicative

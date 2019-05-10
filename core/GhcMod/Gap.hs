@@ -79,15 +79,10 @@ import NameSet
 import OccName
 import Outputable
 import PprTyThing
-import IfaceSyn
 import StringBuffer
 import TcType
 import Var (varType)
 import System.Directory
-import SysTools
-#if __GLASGOW_HASKELL__ >= 800
-import GHCi (stopIServ)
-#endif
 
 import qualified Name
 import qualified InstEnv
@@ -101,13 +96,9 @@ import CoAxiom (coAxiomTyCon)
 import IfaceSyn (showToIface)
 #endif
 
-#if __GLASGOW_HASKELL__ >= 708
 import FamInstEnv
 import ConLike (ConLike(..))
 import PatSyn
-#else
-import TcRnTypes
-#endif
 
 -- GHC 7.8 doesn't define this macro, nor does GHC 7.10.0
 -- It IS defined from 7.10.1 and up though.
@@ -133,20 +124,10 @@ import Data.Convertible
 import RdrName (rdrNameOcc)
 #endif
 
-#if __GLASGOW_HASKELL__ < 710
-import UniqFM (eltsUFM)
-import Module
-#endif
-
 #if __GLASGOW_HASKELL__ >= 804
 import qualified EnumSet as E (EnumSet, empty)
 #elif __GLASGOW_HASKELL__ >= 704
 import qualified Data.IntSet as I (IntSet, empty)
-#endif
-
-#if __GLASGOW_HASKELL__ < 706
-import Control.DeepSeq (NFData(rnf))
-import Data.ByteString.Lazy.Internal (ByteString(..))
 #endif
 
 import Bag
@@ -154,7 +135,6 @@ import Lexer as L
 import Parser
 import SrcLoc
 import Packages
-import Data.Generics (GenericQ, extQ, gmapQ)
 #if __GLASGOW_HASKELL__ < 804
 import GHC.SYB.Utils (Stage(..))
 #endif

@@ -16,7 +16,7 @@
 {-# LANGUAGE CPP, OverloadedStrings #-}
 module GhcMod.Caching (
     Cached(..)
-  , ChCacheData(..)
+  , ChCacheData
   , cached
   , invalidatingInputFiles
   ) where

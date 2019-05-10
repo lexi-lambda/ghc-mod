@@ -50,7 +50,6 @@ module GhcModCore (
   , loadMappedFileSource
   , withMappedFile
   , Gap.listVisibleModuleNames
-  , defaultLintOpts
   , Expression(..)
   , pretty
   , LightGhc(..)
@@ -68,10 +67,11 @@ import GhcMod.Monad.Types ( GmState(..), cradle, options, GmLog(..), GmEnv(..), 
 
 import GhcMod.ModuleLoader ( getModulesGhc' )
 import GhcMod.Target ( cabalResolvedComponents )
-import GhcMod.Types ( GmGhcSession(..), GhcModState(..), GmModuleGraph(..),gmcHomeModuleGraph, Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..)
-                    , GhcModError(..), defaultLintOpts, Expression(..) )
+import GhcMod.Types ( GmGhcSession(..), GhcModState(..), Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..)
+                    , GhcModError(..), Expression(..) )
 import GhcMod.Utils ( makeAbsolute', mkRevRedirMapFunc
                     , withMappedFile)
 import qualified GhcMod.Gap as Gap ( mkErrStyle', GhcPs, GhcRn, GhcTc, listVisibleModuleNames )
 import GhcMod.LightGhc ( runLightGhc )
 import GhcMod.SrcUtils ( pretty )
+import GhcProject.Types ( GmModuleGraph(..), gmcHomeModuleGraph )

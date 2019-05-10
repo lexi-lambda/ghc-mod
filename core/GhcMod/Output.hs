@@ -19,16 +19,11 @@
 
 {-# LANGUAGE FlexibleInstances #-}
 module GhcMod.Output (
-    gmPutStr
-  , gmErrStr
-  , gmPutStrLn
-  , gmErrStrLn
+    gmErrStrLn
 
-  , gmPutStrIO
   , gmErrStrIO
 
   , gmReadProcess
-  , gmReadProcess'
 
   , stdoutGateway
   , flushStdoutGateway
@@ -93,23 +88,22 @@ chanOutputFns c = (write GmOutStream, write GmErrStream)
  where
    write stream s = liftIO $ writeChan c $ Right $ (stream,s)
 
-gmPutStr, gmPutStrLn, gmErrStr, gmErrStrLn
+gmErrStr, gmErrStrLn
     :: (MonadIO m, GmOut m) => String -> m ()
 
-gmPutStr str = do
-  putOut <- gmPutStrIO
-  putOut str
+-- gmPutStr str = do
+--   putOut <- gmPutStrIO
+--   putOut str
 
 gmErrStr str = do
   putErr <- gmErrStrIO
   putErr str
 
-gmPutStrLn = gmPutStr . (++"\n")
+-- gmPutStrLn = gmPutStr . (++"\n")
 gmErrStrLn = gmErrStr . (++"\n")
 
-gmPutStrIO, gmErrStrIO :: (GmOut m, MonadIO mi) => m (String -> mi ())
+gmErrStrIO :: (GmOut m, MonadIO mi) => m (String -> mi ())
 
-gmPutStrIO = fst `liftM` outputFns
 gmErrStrIO = snd `liftM` outputFns
 
 
@@ -122,8 +116,8 @@ gmReadProcess = do
     Nothing ->
         return $ readProcess
 
-gmReadProcess' :: GmOut m => m (FilePath -> [String] -> String -> IO ByteString)
-gmReadProcess' = readProcessStderrChan
+-- gmReadProcess' :: GmOut m => m (FilePath -> [String] -> String -> IO ByteString)
+-- gmReadProcess' = readProcessStderrChan
 
 flushStdoutGateway :: Chan (Either (MVar ()) (GmStream, String)) -> IO ()
 flushStdoutGateway c = do

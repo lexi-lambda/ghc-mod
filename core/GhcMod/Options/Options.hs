@@ -33,6 +33,7 @@ import GhcMod.Options.Help
 import Data.Monoid
 import Prelude
 
+
 -- | Parse a set of arguments according to the ghc-mod CLI flag spec, producing
 -- @Options@ set accordingly.
 parseCmdLineOptions :: [String] -> Maybe Options

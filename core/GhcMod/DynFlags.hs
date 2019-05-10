@@ -97,14 +97,14 @@ withDynFlags setFlags body = G.gbracket setup teardown (\_ -> body)
         return dflags
     teardown = void . G.setSessionDynFlags
 
-withCmdFlags :: GhcMonad m => LoadGhcEnvironment -> [GHCOption] -> m a -> m a
-withCmdFlags loadGhcEnv flags body = G.gbracket setup teardown (\_ -> body)
-  where
-    setup = do
-        dflags <- G.getSessionDynFlags
-        void $ G.setSessionDynFlags =<< addCmdOpts loadGhcEnv flags dflags
-        return dflags
-    teardown = void . G.setSessionDynFlags
+-- withCmdFlags :: GhcMonad m => LoadGhcEnvironment -> [GHCOption] -> m a -> m a
+-- withCmdFlags loadGhcEnv flags body = G.gbracket setup teardown (\_ -> body)
+--   where
+--     setup = do
+--         dflags <- G.getSessionDynFlags
+--         void $ G.setSessionDynFlags =<< addCmdOpts loadGhcEnv flags dflags
+--         return dflags
+--     teardown = void . G.setSessionDynFlags
 
 ----------------------------------------------------------------
 

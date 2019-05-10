@@ -1,4 +1,7 @@
-module GhcMod.Read where
+module GhcMod.Read
+  (
+    readMaybe
+  ) where
 
 import Text.Read (readPrec_to_S, readPrec, minPrec)
 import qualified Text.ParserCombinators.ReadP as P

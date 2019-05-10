@@ -18,14 +18,25 @@
 {-# LANGUAGE DoAndIfThenElse #-}
 
 module GhcMod.Utils (
-    module GhcMod.Utils
-  , module Utils
-  , readProcess
+    readProcess
   , readUtf8File
+  , dropWhileEnd
+  , makeAbsolute'
+  , withDirectory_
+  , findFilesWith'
+  , newTempDir
+  , whenM
+  , mkRevRedirMapFunc
+  , withMappedFile
+  , getCanonicalFileNameSafe
+  , TimedFile(..)
+  , timeFile
+  , timeMaybe
+  , mightExist
   ) where
 
 import Control.Applicative
-import Data.Char
+-- import Data.Char
 import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
 import Data.Either (rights)
@@ -35,14 +46,11 @@ import GhcMod.Error
 import GhcMod.Types
 import GhcMod.Monad.Types
 import System.Directory
-import System.Environment
 import System.FilePath
 import System.IO (openFile, hSetEncoding, utf8, hGetContents, IOMode (ReadMode))
 import System.IO.Temp (createTempDirectory)
 import System.Process (readProcess)
-import Text.Printf
 
-import Paths_ghc_mod_core (getLibexecDir, getBinDir)
 import Utils
 import Prelude
 
@@ -57,56 +65,12 @@ withDirectory_ dir action =
     (liftIO . setCurrentDirectory)
     (\_ -> liftIO (setCurrentDirectory dir) >> action)
 
-uniqTempDirName :: FilePath -> FilePath
-uniqTempDirName dir =
-  "ghc-mod" ++ map escapeDriveChar drive ++ map escapePathChar path
-  where
-    (drive, path) = splitDrive dir
-    escapeDriveChar :: Char -> Char
-    escapeDriveChar c
-      | isAlphaNum c = c
-      | otherwise     = '-'
-    escapePathChar :: Char -> Char
-    escapePathChar c
-      | c `elem` pathSeparators = '-'
-      | otherwise               = c
-
 newTempDir :: FilePath -> IO FilePath
 newTempDir _dir =
   flip createTempDirectory "ghc-mod" =<< getTemporaryDirectory
 
 whenM :: Monad m => m Bool -> m () -> m ()
 whenM mb ma = mb >>= flip when ma
-
--- | Returns the path to the currently running ghc-mod executable. With ghc<7.6
--- this is a guess but >=7.6 uses 'getExecutablePath'.
-ghcModExecutable :: IO FilePath
-ghcModExecutable = do
-    exe <- getExecutablePath'
-    stack <- lookupEnv "STACK_EXE"
-    case takeBaseName exe of
-      "spec" | Just _ <- stack ->
-          (</> "ghc-mod") <$> getBinDir
-      "spec" ->
-          (</> "dist/build/ghc-mod/ghc-mod") <$> getCurrentDirectory
-      "ghc-mod" ->
-          return exe
-      _ ->
-          return $ takeDirectory exe </> "ghc-mod"
-
-getExecutablePath' :: IO FilePath
-#if __GLASGOW_HASKELL__ >= 706
-getExecutablePath' = getExecutablePath
-#else
-getExecutablePath' = getProgName
-#endif
-
-canonFilePath :: FilePath -> IO FilePath
-canonFilePath f = do
-  p <- canonicalizePath f
-  e <- doesFileExist p
-  when (not e) $ error $ "canonFilePath: not a file: " ++ p
-  return p
 
 withMappedFile :: (IOish m, GmState m, GmEnv m) =>
                   forall a. FilePath -> (FilePath -> m a) -> m a

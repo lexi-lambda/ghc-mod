@@ -14,7 +14,10 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {-# LANGUAGE CPP, RankNTypes #-}
-module GhcMod.DebugLogger where
+module GhcMod.DebugLogger
+  (
+    debugLogAction
+  ) where
 
 -- (c) The University of Glasgow 2005
 --
@@ -57,7 +60,7 @@ import Outputable (SDoc, PprStyle, runSDoc, initSDocContext, blankLine)
 import qualified Outputable
 import ErrUtils
 
-import GhcMod.Error
+-- import GhcMod.Error
 import GhcMod.Gap
 import Prelude
 
@@ -66,36 +69,24 @@ debugLogAction putErr _reason dflags severity srcSpan style' msg
     = case severity of
       SevOutput      -> printSDoc putErr msg style'
 
-#if __GLASGOW_HASKELL__ >= 706
       SevDump        -> printSDoc putErr (msg Outputable.$$ blankLine) style'
-#endif
 
-#if __GLASGOW_HASKELL__ >= 708
       SevInteractive -> let
           putStrSDoc = debugLogActionHPutStrDoc dflags putErr
        in
           putStrSDoc msg style'
-#endif
       SevInfo        -> printErrs putErr msg style'
       SevFatal       -> printErrs putErr msg style'
       _              -> do putErr "\n"
-#if __GLASGOW_HASKELL__ >= 706
                            printErrs putErr (mkLocMessage severity srcSpan msg) style'
-#else
-                           printErrs putErr (mkLocMessage srcSpan msg) style'
-#endif
                            -- careful (#2302): printErrs prints in UTF-8,
                            -- whereas converting to string first and using
                            -- hPutStr would just emit the low 8 bits of
                            -- each unicode char.
     where
-#if __GLASGOW_HASKELL__ >= 706
       printSDoc put = debugLogActionHPrintDoc  dflags put
       printErrs put = debugLogActionHPrintDoc  dflags put
-#endif
 
-
-#if __GLASGOW_HASKELL__ >= 706
 
 debugLogActionHPrintDoc :: DynFlags -> (String -> IO ()) -> SDoc -> PprStyle -> IO ()
 debugLogActionHPrintDoc dflags put d sty
@@ -109,16 +100,6 @@ debugLogActionHPutStrDoc dflags put d sty
           -- calls to this log-action can output all on the same line
     doc = runSDoc d (initSDocContext dflags sty)
 
-#else
-
-printSDoc = printErrs
-
-printErrs :: (String -> IO ()) -> SDoc -> PprStyle -> IO ()
-printErrs put doc sty = do
-  gmPrintDoc PageMode 100 put (runSDoc doc (initSDocContext sty))
-
-#endif
-
 gmPrintDoc :: Mode -> Int -> (String -> IO ()) -> Doc -> IO ()
 -- printDoc adds a newline to the end
 gmPrintDoc mode cols put doc = gmPrintDoc_ mode cols put (doc $$ text "")
@@ -130,9 +111,7 @@ gmPrintDoc_ mode pprCols putS doc
     put (Chr c)  next = putS [c] >> next
     put (Str s)  next = putS s >> next
     put (PStr s) next = putS (unpackFS s) >> next
-#if __GLASGOW_HASKELL__ >= 708
     put (ZStr s) next = putS (zString s) >> next
-#endif
 #if __GLASGOW_HASKELL__ >= 806
     put (LStr s) next   = putS (unpackLitString s) >> next
     put (RStr n c) next = putS (replicate n c) >> next

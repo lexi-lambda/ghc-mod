@@ -23,7 +23,7 @@ import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import Control.Applicative
 #if __GLASGOW_HASKELL__ >= 804
-import GHC.LanguageExtensions
+-- import GHC.LanguageExtensions
 import qualified EnumSet as E
 import qualified Data.Set as IS
 #else
@@ -210,6 +210,7 @@ deriveEqDynFlags qds = do
 deriving instance Eq IncludeSpecs
 #endif
 #if __GLASGOW_HASKELL__ >= 804
+toSet :: (Ord a, Enum a) => E.EnumSet a -> IS.Set a
 toSet es = IS.fromList $ E.toList es
 
 deriving instance Ord GeneralFlag

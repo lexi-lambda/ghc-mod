@@ -16,22 +16,11 @@
 
 {-# LANGUAGE ExistentialQuantification #-}
 module GhcMod.Error (
-  --   GhcModError(..)
-  -- , GmError
     gmeDoc
   , ghcExceptionDoc
-  -- , liftMaybe
-  -- , overrideError
-  -- , modifyError
-  -- , modifyError'
-  -- , modifyGmError
-  -- , tryFix
-  -- , GHandler(..)
   , gcatches
 
   -- * Re-exported
-  -- , module Control.Monad.Error
-  -- , module Control.Exception
   , GHandler(..)
   , when
   , msum
@@ -64,7 +53,7 @@ import GhcMod.Types
 import GhcMod.Pretty
 import Prelude hiding ( (<>) )
 
-type GmError m = MonadError GhcModError m
+-- type GmError m = MonadError GhcModError m
 
 gmeDoc :: GhcModError -> Doc
 gmeDoc e = case e of
@@ -139,26 +128,26 @@ ghcExceptionDoc (Panic msg) = vcat $ map text $ lines $ printf "\
 
 ghcExceptionDoc e = text $ showGhcException e ""
 
-liftMaybe :: MonadError e m => e -> m (Maybe a) -> m a
-liftMaybe e action = maybe (throwError e) return =<< action
+-- liftMaybe :: MonadError e m => e -> m (Maybe a) -> m a
+-- liftMaybe e action = maybe (throwError e) return =<< action
 
-overrideError :: MonadError e m => e -> m a -> m a
-overrideError e action = modifyError (const e) action
+-- overrideError :: MonadError e m => e -> m a -> m a
+-- overrideError e action = modifyError (const e) action
 
-modifyError :: MonadError e m => (e -> e) -> m a -> m a
-modifyError f action = action `catchError` \e -> throwError $ f e
+-- modifyError :: MonadError e m => (e -> e) -> m a -> m a
+-- modifyError f action = action `catchError` \e -> throwError $ f e
 
-infixr 0 `modifyError'`
-modifyError' :: MonadError e m => m a -> (e -> e) -> m a
-modifyError' = flip modifyError
+-- infixr 0 `modifyError'`
+-- modifyError' :: MonadError e m => m a -> (e -> e) -> m a
+-- modifyError' = flip modifyError
 
-modifyGmError :: (MonadIO m, ExceptionMonad m)
-              => (GhcModError -> GhcModError) -> m a -> m a
-modifyGmError f a = gcatch a $ \(ex :: GhcModError) -> liftIO $ throwIO (f ex)
+-- modifyGmError :: (MonadIO m, ExceptionMonad m)
+--               => (GhcModError -> GhcModError) -> m a -> m a
+-- modifyGmError f a = gcatch a $ \(ex :: GhcModError) -> liftIO $ throwIO (f ex)
 
-tryFix :: MonadError e m => m a -> (e -> m ()) -> m a
-tryFix action f = do
-  action `catchError` \e -> f e >> action
+-- tryFix :: MonadError e m => m a -> (e -> m ()) -> m a
+-- tryFix action f = do
+--   action `catchError` \e -> f e >> action
 
 data GHandler m a = forall e . Exception e => GHandler (e -> m a)
 
