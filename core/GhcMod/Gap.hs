@@ -135,6 +135,7 @@ import Lexer as L
 import Parser
 import SrcLoc
 import Packages
+import Data.Generics (GenericQ, extQ, gmapQ)
 #if __GLASGOW_HASKELL__ < 804
 import GHC.SYB.Utils (Stage(..))
 #endif
