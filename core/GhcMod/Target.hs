@@ -26,10 +26,10 @@ module GhcMod.Target
   , runGmlTWith'
   , runGmPkgGhc
 
-  , packageGhcOptions -- Exe.Debug
-  , moduleComponents -- Exe.Debug
-  , pickComponent -- Exe.Debug
-  , findCandidates -- Exe.Debug
+  -- , packageGhcOptions -- Exe.Debug
+  -- , moduleComponents -- Exe.Debug
+  -- , pickComponent -- Exe.Debug
+  -- , findCandidates -- Exe.Debug
   ) where
 
 import Control.Arrow

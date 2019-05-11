@@ -17,12 +17,12 @@
 {-# LANGUAGE CPP #-}
 module GhcMod.Monad (
     runGhcModT
-  , runGhcModT' -- Exe.Internal
-  , hoistGhcModT -- Exe.Internal
-  , runGmlT -- Exe.Browse
+  -- , runGhcModT' -- Exe.Internal
+  -- , hoistGhcModT -- Exe.Internal
+  -- , runGmlT -- Exe.Browse
   , runGmlT' -- Exe.CaseSplit
-  , runGmlTWith -- Exe.Check
-  , runGmPkgGhc -- Exe.Browse
+  -- , runGmlTWith -- Exe.Check
+  -- , runGmPkgGhc -- Exe.Browse
   ) where
 
 import GhcMod.Types
