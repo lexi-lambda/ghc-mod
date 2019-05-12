@@ -56,12 +56,11 @@ import GhcMod.Logging
 import GhcMod.Output
 import GhcMod.CustomPackageDb
 import GhcMod.Stack
+import GhcMod.Error
 import System.FilePath
 import System.Process
 import System.Exit
 import Prelude hiding ((.))
-
-import Debug.Trace
 
 import Paths_ghc_mod_core as GhcMod
 
@@ -195,7 +194,7 @@ getQueryEnv = do
 runCHQuery :: (IOish m, GmOut m, GmEnv m, Typeable pt)
            => ProjSetup (pt :: ProjType) -> Query (pt :: ProjType) b -> m b
 runCHQuery ps a = do
-  crdl <- traceShowId <$> cradle
+  crdl <- cradle
   progs <- patchStackPrograms crdl =<< (optPrograms <$> options)
   readProc <- gmReadProcess
   case cradleCabalFile crdl of
@@ -275,11 +274,10 @@ getUnit ps = do
         | Just ccf <- cabalFile
         , CabalFile ucf <- uCabalFile u = ucf == ccf
         | otherwise = True
-  allUnits <- traceShowId <$> runCHQuery ps projectUnits
-  let unit = case NE.filter filterUnit allUnits of
-               x:_ -> x
-               _ -> error "getUnit: no units found matching the cabal file!"
-  return unit
+  allUnits <- runCHQuery ps projectUnits
+  case NE.filter filterUnit allUnits of
+    x:_ -> return x
+    _ -> throw $ GMEString "getUnit: no units found matching the cabal file!"
 
 withAutogen :: (IOish m, GmEnv m, GmOut m, GmLog m, Typeable pt) => ProjSetup pt -> m a -> m a
 withAutogen ps action = do

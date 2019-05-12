@@ -46,8 +46,6 @@ import Distribution.Helper (runQuery, mkQueryEnv, compilerVersion, DistDir(..), 
 import Data.List (intercalate)
 import Data.Version (Version(..))
 
-import Debug.Trace
-
 ----------------------------------------------------------------
 
 -- | Finding 'Cradle'.
@@ -160,8 +158,8 @@ stackCradle stackProg wdir = do
     mzero
 #endif
 
-    cabalFile <- MaybeT $ liftIO $ (traceShowId <$> findCabalFile wdir)
-    stackConfigFile <- MaybeT $ liftIO $ (traceShowId <$> findStackConfigFile (takeDirectory cabalFile))
+    cabalFile <- MaybeT $ liftIO $ (findCabalFile wdir)
+    stackConfigFile <- MaybeT $ liftIO $ (findStackConfigFile (takeDirectory cabalFile))
     let stackDir = takeDirectory stackConfigFile
 
     gmLog GmInfo "" $ text "Found Stack project at" <+>: text stackDir
