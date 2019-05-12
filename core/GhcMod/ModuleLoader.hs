@@ -4,8 +4,8 @@
 -- | Uses GHC hooks to load a TypecheckedModule
 
 module GhcMod.ModuleLoader
-  ( getModulesGhc
-  , getModulesGhc'
+  ( -- getModulesGhc
+    getModulesGhc'
   ) where
 
 import           Control.Monad.IO.Class
@@ -13,9 +13,10 @@ import           Control.Monad.IO.Class
 import qualified Data.Map                          as Map
 import           Data.IORef
 
-import qualified GhcMod.Monad                      as GM
+-- import qualified GhcMod.Monad                      as GM
 import qualified GhcMod.Target                     as GM
 import qualified GhcMod.Types                      as GM
+import qualified GhcMod.Monad.Types                as GM
 
 import           GHC                               (TypecheckedModule, ParsedModule)
 import qualified GHC
@@ -144,13 +145,12 @@ hscFrontend keepInfoFunc saveTypechecked saveParsed mod_summary = do
         return tc_gbl_env
       else do
         hpm <- GHC.hscParse' mod_summary
-        hsc_env <- GHC.getHscEnv
 #if __GLASGOW_HASKELL__ >= 804
   --    tcRnModule' :: ModSummary -> Bool -> HsParsedModule -> Hsc TcGblEnv
         GHC.tcRnModule' mod_summary False hpm
 #else
+        hsc_env <- GHC.getHscEnv
         GHC.tcRnModule' hsc_env mod_summary False hpm
 #endif
 
 -- ---------------------------------------------------------------------
-

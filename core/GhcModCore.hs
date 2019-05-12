@@ -1,55 +1,77 @@
 -- | The ghc-mod library.
 
 module GhcModCore (
-  -- * Cradle
-    Cradle(..)
-  , Project(..)
-  , findCradle
-  -- * Options
-  , Options(..)
-  , LineSeparator(..)
-  , OutputStyle(..)
-  , FileMapping(..)
-  , defaultOptions
-  -- * Logging
-  , GmLogLevel
-  , increaseLogLevel
-  , decreaseLogLevel
-  , gmSetLogLevel
-  , gmLog
-  -- * Types
-  , ModuleString
-  , Expression(..)
-  , GhcPkgDb
-  -- , Symbol
-  -- , SymbolDb
-  , GhcModError(..)
-  -- * Monad Types
-  , GhcModT
-  , IOish
-  -- * Monad utilities
-  , runGhcModT
-  , withOptions
-  , dropSession
-  -- * Output
-  , gmPutStr
-  , gmErrStr
-  , gmPutStrLn
-  , gmErrStrLn
-  -- * FileMapping
-  , loadMappedFile
-  , loadMappedFileSource
-  , unloadMappedFile
-  -- * HIE integration utilities
-  , getModulesGhc
+  -- * Used in hie-plugin-api
+    withDynFlags
+  , gcatches
+  , GHandler(..)
+  , ghcExceptionDoc
+  , Gap.mkErrStyle'
+  , renderGm
+  , cabalResolvedComponents
+  , GmState(..)
+  , GmGhcSession(..)
+  , GhcModState(..)
+  , GmModuleGraph(..)
+  , gmcHomeModuleGraph
   , getModulesGhc'
+  , Cradle(..)
+  , cradle
+  , GhcModT
+  , runGhcModT
+  , GmlT(..)
+  , gmlGetSession
+  , gmlSetSession
+  , MonadIO(..)
+  , GmLogLevel(..)
+  , Options(..)
+  , options
+  , defaultOptions
+  , OutputOpts(..)
+  , findCradle'
+  , GmEnv(..)
+  , GmLog(..)
+  , GmOut(..)
+  , GhcModEnv(..)
+  , mkRevRedirMapFunc
+  , makeAbsolute'
+  , getMMappedFiles
+  , IOish
+  , GhcModError(..)
+
+  , Gap.GhcPs
+  , Gap.GhcRn
+  , Gap.GhcTc
+
+-- ---------------------------------------------
+
+  -- * HIE integration utilities
+
+  , loadMappedFileSource
+  , withMappedFile
+  , Gap.listVisibleModuleNames
+  , Expression(..)
+  , pretty
+  , LightGhc(..)
+  , runLightGhc
   ) where
 
-import GhcMod.Cradle
-import GhcMod.FileMapping
-import GhcMod.Logging
-import GhcMod.Monad
-import GhcMod.ModuleLoader
-import GhcMod.Output
-import GhcMod.Target
-import GhcMod.Types
+import GhcMod.Cradle ( findCradle')
+import GhcMod.DynFlags ( withDynFlags )
+import GhcMod.Error ( gcatches, GHandler(..), ghcExceptionDoc )
+import GhcMod.FileMapping ( loadMappedFileSource )
+import GhcMod.Logging ( renderGm )
+
+import GhcMod.Monad ( runGhcModT )
+import GhcMod.Monad.Types ( GmState(..), cradle, options, GmLog(..), GmEnv(..), GmlT(..), GmOut(..), gmlGetSession, gmlSetSession, GhcModT, getMMappedFiles, LightGhc(..) )
+
+import GhcMod.ModuleLoader ( getModulesGhc' )
+import GhcMod.Target ( cabalResolvedComponents )
+import GhcMod.Types ( GmGhcSession(..), GhcModState(..), Cradle(..), Options(..), defaultOptions, GmLogLevel(..), GhcModEnv(..),MonadIO(..), GhcModError(..), IOish, OutputOpts(..)
+                    , GhcModError(..), Expression(..) )
+import GhcMod.Utils ( makeAbsolute', mkRevRedirMapFunc
+                    , withMappedFile)
+import qualified GhcMod.Gap as Gap ( mkErrStyle', GhcPs, GhcRn, GhcTc, listVisibleModuleNames )
+import GhcMod.LightGhc ( runLightGhc )
+import GhcMod.SrcUtils ( pretty )
+import GhcProject.Types ( GmModuleGraph(..), gmcHomeModuleGraph )

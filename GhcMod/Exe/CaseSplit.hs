@@ -1,8 +1,7 @@
 {-# LANGUAGE CPP #-}
 
 module GhcMod.Exe.CaseSplit (
-    splits
-  , splits'
+    splits'
   , SplitResult(..)
   ) where
 
@@ -20,16 +19,18 @@ import qualified TyCon as Ty
 import qualified Type as Ty
 import Exception
 
-import GhcMod.Convert
-import GhcMod.DynFlags
-import qualified GhcMod.Gap as Gap
-import GhcMod.Monad
-import GhcMod.SrcUtils
-import GhcMod.Doc
-import GhcMod.Logging
-import GhcMod.Types
+import GhcMod.Convert ( whenFound', emptyResult )
+import GhcMod.DynFlags ( deferErrors )
+import qualified GhcMod.Gap as Gap ( getType, getSrcSpan, GhcTc )
+import GhcMod.Monad ( runGmlT' )
+import GhcMod.Monad.Types ( IOish, GhcModT, GmlT(..), cradle, outputOpts, GmLogLevel(..), MonadIO(..) )
+import GhcMod.SrcUtils ( showName, listifySpans )
+import GhcMod.Doc ( getStyle )
+import GhcMod.Logging ( gmLog, text, ($$), nest, showToDoc )
+import GhcMod.Types ( cradleCurrentDir )
 import GhcMod.Utils (withMappedFile)
 import GhcMod.FileMapping (fileModSummaryWithMapping)
+
 import Control.DeepSeq
 
 ----------------------------------------------------------------
@@ -49,29 +50,6 @@ data SplitResult = SplitResult { sStartLine :: Int
                                , sEndCol    :: Int
                                , sNewText   :: T.Text }
 
--- | Splitting a variable in a equation.
--- Unlike splits', this performs parsing an type checking on every invocation.
--- This is meant for consumption by tools that call ghc-mod as a binary.
-splits :: IOish m
-       => FilePath     -- ^ A target file.
-       -> Int          -- ^ Line number.
-       -> Int          -- ^ Column number.
-       -> GhcModT m String
-splits file lineNo colNo =
-  ghandle handler $ runGmlT' [Left file] deferErrors $ do
-      oopts <- outputOpts
-      crdl <- cradle
-      modSum <- fileModSummaryWithMapping (cradleCurrentDir crdl </> file)
-      p <- G.parseModule modSum
-      tcm <- G.typecheckModule p
-      whenFound' oopts (performSplit file tcm lineNo colNo) $
-        \(SplitResult sLine sCol eLine eCol newText) ->
-          return $!! ((sLine, sCol, eLine, eCol), T.unpack newText)
- where
-   handler (SomeException ex) = do
-     gmLog GmException "splits" $
-           text "" $$ nest 4 (showToDoc ex)
-     emptyResult =<< outputOpts
 
 -- | Split an identifier in a function definition.
 -- Meant for library-usage.

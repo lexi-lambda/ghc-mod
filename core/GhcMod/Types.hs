@@ -3,11 +3,49 @@
   GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans -fno-warn-deprecations #-}
 module GhcMod.Types (
-    module GhcMod.Types
-  , module GhcProject.Types
-  , ModuleName
+  --   module GhcMod.Types
+  -- , module GhcProject.Types
+    ModuleName
   , mkModuleName
   , moduleNameString
+  , Options(..)
+  , GmLogLevel(..)
+  , OutputOpts(..)
+  , Programs(..)
+  , OutputStyle(..)
+  , LineSeparator(..)
+  , GmGhcSession(..)
+  , GhcModOut(..)
+  , GhcModLog(..)
+  , GhcModEnv(..)
+  , GhcModError(..)
+  , GhcModState(..)
+  , MonadIO(..)
+  , MonadIOC
+  , IOish
+  , Cradle(..)
+  , FileMapping(..)
+  , FileMappingMap
+  -- , gmgsSession
+  , Expression(..)
+  , GmStream(..)
+  , GhcPkgDb(..)
+  , StackEnv(..)
+  , Project(..)
+  , ProjSetup(..)
+  , LoadGhcEnvironment(..)
+  , GHCOption
+  , ModuleString(..)
+  , ModulePath(..)
+  , defaultOptions
+  , defaultGhcModState
+  , isCabalHelperProject
+  -- labels
+  , lGmCaches
+  , lGmcComponents
+  , lGmcMergedPkgOptions
+  , lGmcPackageDbStack
+  , lGmcResolvedComponents
   ) where
 
 import Control.Monad.Trans.Control (MonadBaseControl)
@@ -52,13 +90,8 @@ import GhcMod.Caching.Types
 type IOish m = (Functor m, MonadIO m, MonadBaseControl IO m, ExceptionMonad m)
 
 
--- MonadUtils of GHC 7.6 or earlier defines its own MonadIO.
 -- MonadUtils of GHC 7.8 or later imports MonadIO in Monad.Control.IO.Class.
-#if __GLASGOW_HASKELL__ < 708
-type MonadIOC m = (GHC.MonadIO m, MTL.MonadIO m)
-#else
 type MonadIOC m = (MTL.MonadIO m)
-#endif
 
 class MonadIOC m => MonadIO m where
   liftIO :: IO a -> m a
@@ -76,7 +109,7 @@ data FileMapping =  FileMapping {fmPath :: FilePath, fmTemp :: Bool}
 
 type FileMappingMap = Map FilePath FileMapping
 
-data ProgramSource = ProgramSourceUser | ProgramSourceStack
+-- data ProgramSource = ProgramSourceUser | ProgramSourceStack
 
 data Programs = Programs {
   -- | @ghc@ program name.
@@ -330,9 +363,9 @@ data BrowseOpts = BrowseOpts {
         -- ^ If 'True', "browseWith" will return fully qualified name
     } deriving (Show)
 
--- | Default "BrowseOpts" instance
-defaultBrowseOpts :: BrowseOpts
-defaultBrowseOpts = BrowseOpts False False False False
+-- -- | Default "BrowseOpts" instance
+-- defaultBrowseOpts :: BrowseOpts
+-- defaultBrowseOpts = BrowseOpts False False False False
 
 mkLabel ''GhcModCaches
 mkLabel ''GhcModState

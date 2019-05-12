@@ -16,12 +16,25 @@
 
 {-# LANGUAGE CPP #-}
 module GhcMod.PathsAndFiles (
-    module GhcMod.PathsAndFiles
-  , module GhcMod.Caching
+    findCustomPackageDbFile
+  , findCabalFile
+  , findStackConfigFile
+  , findCabalSandboxDir
+  , setupConfigFile
+  , setupConfigPath
+  , mergedPkgOptsCacheFile
+  , pkgDbStackCacheFile
+  , macrosHeaderPath
+  , sandboxConfigFile
+  , autogenModulePath
+  , cabalHelperCacheFile
+  , getSandboxDb
+  , packageCache
+  , resolvedComponentsCacheFile
   ) where
 
 import Config (cProjectVersion)
-import Control.Arrow (second)
+-- import Control.Arrow (second)
 import Control.Applicative
 import Control.Exception as E
 import Control.Monad
@@ -36,7 +49,7 @@ import System.FilePath
 import System.Process
 
 import GhcMod.Types
-import GhcMod.Caching
+-- import GhcMod.Caching
 import qualified GhcMod.Utils as U
 import Utils (mightExist)
 import Prelude
@@ -224,12 +237,12 @@ ghcSandboxPkgDbDir buildPlatf = do
 packageCache :: String
 packageCache = "package.cache"
 
--- | Filename of the symbol table cache file.
-symbolCache :: Cradle -> FilePath
-symbolCache crdl = cradleRootDir crdl </> cradleDistDir crdl </> symbolCacheFile
+-- -- | Filename of the symbol table cache file.
+-- symbolCache :: Cradle -> FilePath
+-- symbolCache crdl = cradleRootDir crdl </> cradleDistDir crdl </> symbolCacheFile
 
-symbolCacheFile :: String
-symbolCacheFile = "ghc-mod.symbol-cache"
+-- symbolCacheFile :: String
+-- symbolCacheFile = "ghc-mod.symbol-cache"
 
 resolvedComponentsCacheFile :: FilePath -> FilePath
 resolvedComponentsCacheFile dist =

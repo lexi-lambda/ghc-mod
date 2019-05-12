@@ -1,9 +1,9 @@
 module GhcMod.FileMapping
-    ( loadMappedFile
-    , loadMappedFileSource
-    , unloadMappedFile
+    ( -- loadMappedFile
+      loadMappedFileSource
+    -- , unloadMappedFile
     , mapFile
-    , fileModSummaryWithMapping
+    , fileModSummaryWithMapping -- For GhcMod.Exe.CaseSplit
     ) where
 
 import GhcMod.Types
@@ -20,18 +20,18 @@ import Control.Monad.Trans.Maybe
 import GHC
 import Control.Monad
 
-{- | maps 'FilePath', given as first argument to take source from
-'FilePath' given as second argument. Works exactly the same as
-first form of `--map-file` CLI option.
+-- {- | maps 'FilePath', given as first argument to take source from
+-- 'FilePath' given as second argument. Works exactly the same as
+-- first form of `--map-file` CLI option.
 
-\'from\' can be either full path, or path relative to project root.
-\'to\' has to be either relative to project root, or full path (preferred)
--}
-loadMappedFile :: IOish m
-               => FilePath -- ^ \'from\', file that will be mapped
-               -> FilePath -- ^ \'to\', file to take source from
-               -> GhcModT m ()
-loadMappedFile from to = loadMappedFile' from to False
+-- \'from\' can be either full path, or path relative to project root.
+-- \'to\' has to be either relative to project root, or full path (preferred)
+-- -}
+-- loadMappedFile :: IOish m
+--                => FilePath -- ^ \'from\', file that will be mapped
+--                -> FilePath -- ^ \'to\', file to take source from
+--                -> GhcModT m ()
+-- loadMappedFile from to = loadMappedFile' from to False
 
 {- |
 maps 'FilePath', given as first argument to have source as given
@@ -82,17 +82,17 @@ mkMappedTarget _ _ taoc (Just to) =
 mkMappedTarget _ tid taoc _ =
   mkTarget tid taoc Nothing
 
-{-|
-unloads previously mapped file \'file\', so that it's no longer mapped,
-and removes any temporary files created when file was
-mapped.
+-- {-|
+-- unloads previously mapped file \'file\', so that it's no longer mapped,
+-- and removes any temporary files created when file was
+-- mapped.
 
-\'file\' should be either full path, or relative to project root.
--}
-unloadMappedFile :: IOish m
-                 => FilePath -- ^ \'file\', file to unmap
-                 -> GhcModT m ()
-unloadMappedFile = getCanonicalFileNameSafe >=> unloadMappedFile'
+-- \'file\' should be either full path, or relative to project root.
+-- -}
+-- unloadMappedFile :: IOish m
+--                  => FilePath -- ^ \'file\', file to unmap
+--                  -> GhcModT m ()
+-- unloadMappedFile = getCanonicalFileNameSafe >=> unloadMappedFile'
 
 unloadMappedFile' :: IOish m => FilePath -> GhcModT m ()
 unloadMappedFile' cfn = void $ runMaybeT $ do

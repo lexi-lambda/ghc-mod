@@ -4,14 +4,24 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module GhcMod.SrcUtils where
+module GhcMod.SrcUtils
+  (
+    pretty
+  , showName
+  , listifySpans
+
+  -- For Exe.Info
+  , collectSpansTypes
+  , toTup
+  , cmp
+  ) where
 
 import Control.Applicative
 import CoreUtils (exprType)
 import Data.Generics
 import Data.Maybe
 import Data.Ord as O
-import GHC (LHsExpr, LPat, DynFlags, SrcSpan, Type, Located, ParsedSource, RenamedSource, TypecheckedSource, GenLocated(L))
+import GHC (LHsExpr, LPat, DynFlags, SrcSpan, Type, Located, TypecheckedSource, GenLocated(L))
 import qualified GHC as G
 import qualified Var as G
 import qualified Type as G
@@ -19,11 +29,9 @@ import qualified Type as G
 import GHC.SYB.Utils
 #endif
 import GhcMonad
-import qualified Language.Haskell.Exts as HE
 import GhcMod.Doc
 import GhcMod.Gap
 import qualified GhcMod.Gap as Gap
-import OccName (OccName)
 import Outputable (PprStyle)
 import TcHsSyn (hsPatType)
 import Prelude
@@ -48,20 +56,20 @@ instance HasType (LPat GhcTc) where
 #if __GLASGOW_HASKELL__ >= 804
 -- | Stores mapping from monomorphic to polymorphic types
 type CstGenQS = M.Map (G.IdP GhcTc) Type
--- | Generic type to simplify SYB definition
-type CstGenQT m a = a GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
+-- -- | Generic type to simplify SYB definition
+-- type CstGenQT m a = a GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
 #else
 -- | Stores mapping from monomorphic to polymorphic types
 type CstGenQS = M.Map G.Var Type
--- | Generic type to simplify SYB definition
-type CstGenQT a = forall m. GhcMonad m => a G.Id -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
+-- -- | Generic type to simplify SYB definition
+-- type CstGenQT a = forall m. GhcMonad m => a G.Id -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
 #endif
 
 collectSpansTypes :: (GhcMonad m) => Bool -> G.TypecheckedModule -> (Int,Int) -> m [(SrcSpan, Type)]
 collectSpansTypes withConstraints tcs lc = collectSpansTypes' withConstraints tcs (`G.spans` lc)
 
-collectAllSpansTypes :: (GhcMonad m) => Bool -> G.TypecheckedModule -> m [(SrcSpan, Type)]
-collectAllSpansTypes withConstraints tcs = collectSpansTypes' withConstraints tcs (const True)
+-- collectAllSpansTypes :: (GhcMonad m) => Bool -> G.TypecheckedModule -> m [(SrcSpan, Type)]
+-- collectAllSpansTypes withConstraints tcs = collectSpansTypes' withConstraints tcs (const True)
 
 collectSpansTypes' :: forall m. (GhcMonad m) => Bool -> G.TypecheckedModule -> (SrcSpan -> Bool) -> m [(SrcSpan, Type)]
 -- collectSpansTypes' :: forall m.(GhcMonad m) => Bool -> G.TypecheckedModule -> (Int, Int) -> m [(SrcSpan, Type)]
@@ -190,23 +198,23 @@ listifySpans tcs lc = listifyStaged TypeChecker p tcs
   where
     p (L spn _) = G.isGoodSrcSpan spn && spn `G.spans` lc
 
-listifyParsedSpans :: Typeable a => ParsedSource -> (Int, Int) -> [Located a]
-#if __GLASGOW_HASKELL__ >= 804
-listifyParsedSpans pcs lc = listify p pcs
-#else
-listifyParsedSpans pcs lc = listifyStaged Parser p pcs
-#endif
-  where
-    p (L spn _) = G.isGoodSrcSpan spn && spn `G.spans` lc
+-- listifyParsedSpans :: Typeable a => ParsedSource -> (Int, Int) -> [Located a]
+-- #if __GLASGOW_HASKELL__ >= 804
+-- listifyParsedSpans pcs lc = listify p pcs
+-- #else
+-- listifyParsedSpans pcs lc = listifyStaged Parser p pcs
+-- #endif
+--   where
+--     p (L spn _) = G.isGoodSrcSpan spn && spn `G.spans` lc
 
-listifyRenamedSpans :: Typeable a => RenamedSource -> (Int, Int) -> [Located a]
-#if __GLASGOW_HASKELL__ >= 804
-listifyRenamedSpans pcs lc = listify p pcs
-#else
-listifyRenamedSpans pcs lc = listifyStaged Renamer p pcs
-#endif
-  where
-    p (L spn _) = G.isGoodSrcSpan spn && spn `G.spans` lc
+-- listifyRenamedSpans :: Typeable a => RenamedSource -> (Int, Int) -> [Located a]
+-- #if __GLASGOW_HASKELL__ >= 804
+-- listifyRenamedSpans pcs lc = listify p pcs
+-- #else
+-- listifyRenamedSpans pcs lc = listifyStaged Renamer p pcs
+-- #endif
+--   where
+--     p (L spn _) = G.isGoodSrcSpan spn && spn `G.spans` lc
 
 #if __GLASGOW_HASKELL__ < 804
 listifyStaged :: Typeable r => Stage -> (r -> Bool) -> GenericQ [r]
@@ -225,19 +233,19 @@ toTup dflag style (spn, typ) = (fourInts spn, pretty dflag style typ)
 fourInts :: SrcSpan -> (Int,Int,Int,Int)
 fourInts = fromMaybe (0,0,0,0) . Gap.getSrcSpan
 
-fourIntsHE :: HE.SrcSpan -> (Int,Int,Int,Int)
-fourIntsHE loc = ( HE.srcSpanStartLine loc, HE.srcSpanStartColumn loc
-                 , HE.srcSpanEndLine loc, HE.srcSpanEndColumn loc)
+-- fourIntsHE :: HE.SrcSpan -> (Int,Int,Int,Int)
+-- fourIntsHE loc = ( HE.srcSpanStartLine loc, HE.srcSpanStartColumn loc
+--                  , HE.srcSpanEndLine loc, HE.srcSpanEndColumn loc)
 
--- Check whether (line,col) is inside a given SrcSpanInfo
-typeSigInRangeHE :: Int -> Int -> HE.Decl HE.SrcSpanInfo -> Bool
-typeSigInRangeHE lineNo colNo (HE.TypeSig (HE.SrcSpanInfo s _) _ _) =
-  HE.srcSpanStart s <= (lineNo, colNo) && HE.srcSpanEnd s >= (lineNo, colNo)
-typeSigInRangeHE lineNo colNo (HE.TypeFamDecl (HE.SrcSpanInfo s _) _ _ _) =
-  HE.srcSpanStart s <= (lineNo, colNo) && HE.srcSpanEnd s >= (lineNo, colNo)
-typeSigInRangeHE lineNo colNo (HE.DataFamDecl (HE.SrcSpanInfo s _) _ _ _) =
-  HE.srcSpanStart s <= (lineNo, colNo) && HE.srcSpanEnd s >= (lineNo, colNo)
-typeSigInRangeHE _  _ _= False
+-- -- Check whether (line,col) is inside a given SrcSpanInfo
+-- typeSigInRangeHE :: Int -> Int -> HE.Decl HE.SrcSpanInfo -> Bool
+-- typeSigInRangeHE lineNo colNo (HE.TypeSig (HE.SrcSpanInfo s _) _ _) =
+--   HE.srcSpanStart s <= (lineNo, colNo) && HE.srcSpanEnd s >= (lineNo, colNo)
+-- typeSigInRangeHE lineNo colNo (HE.TypeFamDecl (HE.SrcSpanInfo s _) _ _ _) =
+--   HE.srcSpanStart s <= (lineNo, colNo) && HE.srcSpanEnd s >= (lineNo, colNo)
+-- typeSigInRangeHE lineNo colNo (HE.DataFamDecl (HE.SrcSpanInfo s _) _ _ _) =
+--   HE.srcSpanStart s <= (lineNo, colNo) && HE.srcSpanEnd s >= (lineNo, colNo)
+-- typeSigInRangeHE _  _ _= False
 
 pretty :: DynFlags -> PprStyle -> Type -> String
 pretty dflag style = showOneLine dflag style . Gap.typeForUser
@@ -245,5 +253,5 @@ pretty dflag style = showOneLine dflag style . Gap.typeForUser
 showName :: DynFlags -> PprStyle -> G.Name -> String
 showName dflag style name = showOneLine dflag style $ Gap.nameForUser name
 
-showOccName :: DynFlags -> PprStyle -> OccName -> String
-showOccName dflag style name = showOneLine dflag style $ Gap.occNameForUser name
+-- showOccName :: DynFlags -> PprStyle -> OccName -> String
+-- showOccName dflag style name = showOneLine dflag style $ Gap.occNameForUser name

@@ -2,7 +2,19 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE CPP #-}
 
-module GhcMod.DynFlags where
+module GhcMod.DynFlags
+  (
+    withDynFlags
+  , addCmdOpts
+  , eqDynFlags
+  , setEmptyLogger
+  , setDebugLogger
+  , setHscNothing
+  , setHscInterpreted
+  , deferErrors
+  , setNoWarningFlags
+  , setAllWarningFlags
+  ) where
 
 import Control.Applicative
 import Control.Monad
@@ -85,14 +97,14 @@ withDynFlags setFlags body = G.gbracket setup teardown (\_ -> body)
         return dflags
     teardown = void . G.setSessionDynFlags
 
-withCmdFlags :: GhcMonad m => LoadGhcEnvironment -> [GHCOption] -> m a -> m a
-withCmdFlags loadGhcEnv flags body = G.gbracket setup teardown (\_ -> body)
-  where
-    setup = do
-        dflags <- G.getSessionDynFlags
-        void $ G.setSessionDynFlags =<< addCmdOpts loadGhcEnv flags dflags
-        return dflags
-    teardown = void . G.setSessionDynFlags
+-- withCmdFlags :: GhcMonad m => LoadGhcEnvironment -> [GHCOption] -> m a -> m a
+-- withCmdFlags loadGhcEnv flags body = G.gbracket setup teardown (\_ -> body)
+--   where
+--     setup = do
+--         dflags <- G.getSessionDynFlags
+--         void $ G.setSessionDynFlags =<< addCmdOpts loadGhcEnv flags dflags
+--         return dflags
+--     teardown = void . G.setSessionDynFlags
 
 ----------------------------------------------------------------
 

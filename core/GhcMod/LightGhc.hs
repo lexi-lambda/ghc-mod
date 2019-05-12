@@ -1,6 +1,14 @@
 {-# LANGUAGE CPP #-}
 
-module GhcMod.LightGhc where
+module GhcMod.LightGhc
+  (
+    newLightEnv
+  , withLightHscEnv
+  , withLightHscEnv'
+  , teardownLightEnv
+  , runLightGhc
+  , runLightGhc'
+  ) where
 
 import Control.Monad
 import Control.Monad.Reader (runReaderT)
@@ -21,10 +29,8 @@ import GhcMod.Monad.Types
 import GhcMod.DynFlags
 import qualified GhcMod.Gap as Gap
 
-#if __GLASGOW_HASKELL__ >= 802
 initStaticOpts :: Monad m => m ()
 initStaticOpts = return ()
-#endif
 
 -- We have to be more careful about tearing down 'HscEnv's since GHC 8 added an
 -- out of process GHCI server which has to be shutdown.

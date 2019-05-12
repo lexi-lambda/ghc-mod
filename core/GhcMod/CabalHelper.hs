@@ -19,19 +19,16 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 module GhcMod.CabalHelper
-  ( getComponents
+  (
+    getComponents
   , getGhcMergedPkgOptions
   , getCabalPackageDbStack
-  , prepareCabalHelper
   , withAutogen
-  , withCabal
   , withProjSetup
-
-  , runCHQuery
-  -- , packageId
   ) where
 
 import Control.Applicative
+import Control.Exception
 import Control.Monad
 import Control.Category ((.))
 import Data.Dynamic (toDyn, fromDynamic, Dynamic)
@@ -48,6 +45,7 @@ import Distribution.Helper hiding (Programs(..))
 import qualified Distribution.Helper as CH
 import GhcMod.Cradle
 import qualified GhcMod.Types as T
+import GhcMod.Caching
 import GhcMod.Types
 import GhcMod.Monad.Types
 import GhcMod.Utils
@@ -60,6 +58,7 @@ import GhcMod.Error
 import System.FilePath
 import System.Process
 import System.Exit
+import GhcProject.Types
 import Prelude hiding ((.))
 
 import Paths_ghc_mod_core as GhcMod
@@ -203,6 +202,7 @@ runCHQuery ps a = do
 
 -- ---------------------------------------------------------------------
 
+-- <<<<<<< HEAD
 runProjSetup :: (IOish m, GmOut m, GmEnv m, Typeable pt)
              => ProjSetup (pt :: ProjType) -> FilePath -> (QueryEnv (pt :: ProjType) -> IO a) -> m a
 runProjSetup ps cabalFile f = do
@@ -259,12 +259,12 @@ withProjSetup f = do
 
 -- ---------------------------------------------------------------------
 
-prepareCabalHelper :: (IOish m, GmEnv m, GmOut m, GmLog m, Typeable pt) => ProjSetup (pt :: ProjType) -> m ()
-prepareCabalHelper ps = do
-  crdl <- cradle
-  when (isCabalHelperProject $ cradleProject crdl) $ do
-       qe <- getQueryEnv
-       withCabal ps $ liftIO (prepare qe)
+-- prepareCabalHelper :: (IOish m, GmEnv m, GmOut m, GmLog m, Typeable pt) => ProjSetup (pt :: ProjType) -> m ()
+-- prepareCabalHelper ps = do
+--   crdl <- cradle
+--   when (isCabalHelperProject $ cradleProject crdl) $ do
+--        qe <- getQueryEnv
+--        withCabal ps $ liftIO (prepare qe)
 
 getUnit :: (IOish m, GmEnv m, GmOut m, Typeable pt) => ProjSetup pt -> m (Unit pt)
 getUnit ps = do

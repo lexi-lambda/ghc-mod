@@ -16,24 +16,20 @@
 
 {-# LANGUAGE CPP #-}
 module GhcMod.Monad (
-    runGmOutT
-  , runGmOutT'
-  , runGhcModT
-  , runGhcModT'
-  , hoistGhcModT
-  , runGmlT
-  , runGmlT'
-  , runGmlTWith
-  , runGmPkgGhc
-  , withGhcModEnv
-  , withGhcModEnv'
-  , module GhcMod.Monad.Types
+    runGhcModT
+  -- , runGhcModT' -- Exe.Internal
+  -- , hoistGhcModT -- Exe.Internal
+  -- , runGmlT -- Exe.Browse
+  , runGmlT' -- Exe.CaseSplit
+  -- , runGmlTWith -- Exe.Check
+  -- , runGmPkgGhc -- Exe.Browse
   ) where
 
 import GhcMod.Types
 import GhcMod.Monad.Types
 import GhcMod.Error
 import GhcMod.Logging
+import GhcMod.Monad.Newtypes
 import GhcMod.Cradle
 import GhcMod.Target
 import GhcMod.Output

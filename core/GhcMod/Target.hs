@@ -15,24 +15,40 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 {-# LANGUAGE CPP, ViewPatterns, NamedFieldPuns, RankNTypes #-}
-module GhcMod.Target where
+module GhcMod.Target
+  (
+    loadTargets
+  , targetGhcOptions
+  , cabalResolvedComponents
+  , runGmlT
+  , runGmlT'
+  , runGmlTWith
+  , runGmlTWith'
+  , runGmPkgGhc
+
+  -- , packageGhcOptions -- Exe.Debug
+  -- , moduleComponents -- Exe.Debug
+  -- , pickComponent -- Exe.Debug
+  -- , findCandidates -- Exe.Debug
+  ) where
 
 import Control.Arrow
 import Control.Applicative
 import Control.Category ((.))
 import GHC
 import qualified Hooks    as GHC
-import qualified HscTypes as GHC
+-- import qualified HscTypes as GHC
 import qualified GhcMonad as G
 #if __GLASGOW_HASKELL__ >= 800
 import GHC.LanguageExtensions
 #endif
-import GHC.Paths (libdir)
-import SysTools
+-- import GHC.Paths (libdir)
+-- import SysTools
 import DynFlags
 import HscTypes
 import Pretty
 
+import GhcMod.Caching
 import GhcMod.Cradle
 import GhcMod.DynFlags
 import GhcMod.Monad.Types
@@ -48,6 +64,7 @@ import GhcMod.FileMapping
 import GhcMod.LightGhc
 import GhcMod.CustomPackageDb
 import GhcMod.Output
+import GhcProject.Types
 
 import Safe
 import Data.Maybe
@@ -122,21 +139,21 @@ initSession opts mdf = do
      gmsPut s { gmGhcSession = Just $ GmGhcSession nhsc_env_ref }
 
 
--- | Drop the currently active GHC session, the next that requires a GHC session
--- will initialize a new one.
-dropSession :: IOish m => GhcModT m ()
-dropSession = do
-  s <- gmsGet
-  case gmGhcSession s of
-    Just (GmGhcSession ref) -> do
-      -- TODO: This is still not enough, there seem to still be references to
-      -- GHC's state around afterwards.
-      liftIO $ writeIORef ref (error "HscEnv: session was dropped")
-      -- Not available on ghc<7.8; didn't really help anyways
-      -- liftIO $ setUnsafeGlobalDynFlags (error "DynFlags: session was dropped")
-      gmsPut s { gmGhcSession = Nothing }
+-- -- | Drop the currently active GHC session, the next that requires a GHC session
+-- -- will initialize a new one.
+-- dropSession :: IOish m => GhcModT m ()
+-- dropSession = do
+--   s <- gmsGet
+--   case gmGhcSession s of
+--     Just (GmGhcSession ref) -> do
+--       -- TODO: This is still not enough, there seem to still be references to
+--       -- GHC's state around afterwards.
+--       liftIO $ writeIORef ref (error "HscEnv: session was dropped")
+--       -- Not available on ghc<7.8; didn't really help anyways
+--       -- liftIO $ setUnsafeGlobalDynFlags (error "DynFlags: session was dropped")
+--       gmsPut s { gmGhcSession = Nothing }
 
-    Nothing -> return ()
+--     Nothing -> return ()
 
 -- | Run a GmlT action (i.e. a function in the GhcMonad) in the context
 -- of certain files or modules
@@ -152,16 +169,16 @@ runGmlT' :: IOish m
               -> GhcModT m a
 runGmlT' fns mdf action = runGmlTWith fns mdf id action
 
--- | Run a GmlT action (i.e. a function in the GhcMonad) in the context of
--- certain files or modules, with updated GHC flags, and updated ModuleGraph
-runGmlTfm :: IOish m
-              => [Either FilePath ModuleName]
-              -> (forall gm. GhcMonad gm => DynFlags -> gm DynFlags)
-              -> Maybe (GHC.Hooks -> GHC.Hooks)
-              -> GmlT m a
-              -> GhcModT m a
-runGmlTfm fns mdf mUpdateHooks action
-  = runGmlTWith' fns mdf mUpdateHooks id action
+-- -- | Run a GmlT action (i.e. a function in the GhcMonad) in the context of
+-- -- certain files or modules, with updated GHC flags, and updated ModuleGraph
+-- runGmlTfm :: IOish m
+--               => [Either FilePath ModuleName]
+--               -> (forall gm. GhcMonad gm => DynFlags -> gm DynFlags)
+--               -> Maybe (GHC.Hooks -> GHC.Hooks)
+--               -> GmlT m a
+--               -> GhcModT m a
+-- runGmlTfm fns mdf mUpdateHooks action
+--   = runGmlTWith' fns mdf mUpdateHooks id action
 
 -- | Run a GmlT action (i.e. a function in the GhcMonad) in the context of
 -- certain files or modules, with updated GHC flags, updated ModuleGraph and a

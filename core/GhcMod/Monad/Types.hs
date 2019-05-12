@@ -24,22 +24,22 @@ module GhcMod.Monad.Types (
   -- * Monad Types
     GhcModT
   , GmOutT(..)
-  , GmT(..)
+  -- , GmT(..)
   , GmlT(..)
   , LightGhc(..)
   , GmGhc
   , IOish
-  -- * Environment, state and logging
-  , GhcModEnv(..)
+  -- -- * Environment, state and logging
+  -- , GhcModEnv(..)
   , GhcModState(..)
-  , GhcModCaches(..)
-  , defaultGhcModState
-  , GmGhcSession(..)
-  , GmComponent(..)
-  -- * Accessing 'GhcModEnv', 'GhcModState' and 'GhcModLog'
+  -- , GhcModCaches(..)
+  -- , defaultGhcModState
+  -- , GmGhcSession(..)
+  -- , GmComponent(..)
+  -- -- * Accessing 'GhcModEnv', 'GhcModState' and 'GhcModLog'
   , GmLogLevel(..)
-  , GhcModLog(..)
-  , GhcModError(..)
+  -- , GhcModLog(..)
+  -- , GhcModError(..)
   , Gm
   , GmEnv(..)
   , GmState(..)
@@ -50,19 +50,17 @@ module GhcMod.Monad.Types (
   , outputOpts
   , withOptions
   , getMMappedFiles
-  , setMMappedFiles
+  -- , setMMappedFiles
   , addMMappedFile
   , delMMappedFile
   , lookupMMappedFile
   , getMMappedFilePaths
-  -- * Re-exporting convenient stuff
+  -- -- * Re-exporting convenient stuff
   , MonadIO
   , liftIO
   , gmlGetSession
   , gmlSetSession
   ) where
-
-#include "Compat.hs_h"
 
 import GhcMod.Types
 

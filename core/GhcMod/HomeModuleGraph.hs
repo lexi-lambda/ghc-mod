@@ -64,6 +64,7 @@ import GhcMod.Monad.Types
 import GhcMod.Types
 import GhcMod.Utils (withMappedFile, readUtf8File)
 import GhcMod.Gap (parseModuleHeader)
+import GhcProject.Types
 
 -- | Turn module graph into a graphviz dot file
 --
