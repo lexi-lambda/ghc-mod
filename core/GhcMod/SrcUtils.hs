@@ -3,6 +3,8 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE ViewPatterns       #-}
+{-# LANGUAGE PatternSynonyms    #-}
 
 module GhcMod.SrcUtils
   (
@@ -21,7 +23,10 @@ import CoreUtils (exprType)
 import Data.Generics
 import Data.Maybe
 import Data.Ord as O
-import GHC (LHsExpr, LPat, DynFlags, SrcSpan, Type, Located, TypecheckedSource, GenLocated(L))
+import GHC (LHsBind,LHsExpr,HsExpr, LPat, Pat, DynFlags, SrcSpan, Type, Located, TypecheckedSource, GenLocated(L))
+#if __GLASGOW_HASKELL__ >= 808
+import SrcLoc (pattern LL)
+#endif
 import qualified GHC as G
 import qualified Var as G
 import qualified Type as G
@@ -49,7 +54,11 @@ instance HasType (LHsExpr GhcTc) where
         return $ (G.getLoc e, ) <$> CoreUtils.exprType <$> mbe
 
 instance HasType (LPat GhcTc) where
+#if __GLASGOW_HASKELL__ >= 808
+    getType _ (G.dL-> (G.L spn pat)) = return $ Just (spn, hsPatType pat)
+#else
     getType _ (G.L spn pat) = return $ Just (spn, hsPatType pat)
+#endif
 
 ----------------------------------------------------------------
 
@@ -85,8 +94,11 @@ collectSpansTypes' withConstraints tcs f =
     ((return [],)
       `mkQ`  (hsBind    :: G.LHsBind GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)) -- matches on binds
       `extQ` (genericCT :: G.LHsExpr GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)) -- matches on expressions
+#if __GLASGOW_HASKELL__ >= 808
+      `extQ` (genericCTT:: G.LPat    GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)) -- matches on patterns
+#else
       `extQ` (genericCT :: G.LPat    GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)) -- matches on patterns
-
+#endif
       )
     (G.tm_typechecked_source tcs)
   where
@@ -115,12 +127,25 @@ collectSpansTypes' withConstraints tcs f =
     -- Otherwise, it's the same as other cases
     hsBind x s = genericCT x s
     -- Generic SYB function to get type
+    -- genericCT :: forall b . (Data (b GhcTc), HasType (Located (b GhcTc)))
+    -- genericCT :: forall b . (Data (b GhcTc), HasType (b GhcTc))
+    --           => (b GhcTc) -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
+    -- genericCT :: forall b . Located (G.HsBind GhcTc) -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
     genericCT :: forall b . (Data (b GhcTc), HasType (Located (b GhcTc)))
               => Located (b GhcTc) -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
     genericCT x s
       | withConstraints
       = (maybe [] (uncurry $ constrainedType (collectBinders x) s) <$> getType' x, s)
       | otherwise = (maybeToList <$> getType' x, s)
+
+#if __GLASGOW_HASKELL__ >= 808
+    genericCTT :: forall b .
+                 LPat GhcTc -> CstGenQS -> (m [(SrcSpan, Type)], CstGenQS)
+    genericCTT x s
+      | withConstraints
+      = (maybe [] (uncurry $ constrainedType (collectBinders x) s) <$> getType' x, s)
+      | otherwise = (maybeToList <$> getType' x, s)
+#endif
 #if __GLASGOW_HASKELL__ >= 804
     -- Collects everything with Id from LHsBind, LHsExpr, or LPat
     collectBinders :: Data a => a -> [G.IdP GhcTc]
@@ -131,8 +156,15 @@ collectSpansTypes' withConstraints tcs f =
     collectBinders = listifyStaged TypeChecker (const True)
 #endif
     -- Gets monomorphic type with location
+    -- getType' :: forall t . (HasType (Located t)) => Located t -> m (Maybe (SrcSpan, Type))
+    -- getType' :: forall t . (HasType (t)) => Located t -> m (Maybe (SrcSpan, Type))
+#if __GLASGOW_HASKELL__ >= 808
+    getType' :: forall t . (HasType t) => t -> m (Maybe (SrcSpan, Type))
+    getType' x@(LL spn _)
+#else
     getType' :: forall t . (HasType (Located t)) => Located t -> m (Maybe (SrcSpan, Type))
     getType' x@(L spn _)
+#endif
       | G.isGoodSrcSpan spn && f spn
       = getType tcs x
       | otherwise = return Nothing
