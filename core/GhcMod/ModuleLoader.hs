@@ -21,6 +21,9 @@ import qualified GhcMod.Monad.Types                as GM
 import           GHC                               (TypecheckedModule, ParsedModule)
 import qualified GHC
 import qualified DynFlags                          as GHC
+#if __GLASGOW_HASKELL__ >= 806
+import qualified DynamicLoading
+#endif
 import qualified GhcMonad                          as GHC
 import qualified Hooks                             as GHC
 import qualified HscMain                           as GHC
@@ -133,9 +136,18 @@ hscFrontend keepInfoFunc saveTypechecked saveParsed mod_summary = do
     if keepInfo
       then runGhcInHsc $ do
         let modSumWithRaw = tweakModSummaryDynFlags mod_summary
+        let dflags = GHC.ms_hspp_opts mod_summary
+#if __GLASGOW_HASKELL__ >= 806
+        hscEnv <- GHC.getSession
+        dynFlags <- liftIO $ DynamicLoading.initializePlugins hscEnv dflags
+#else
+        dynFlags <- return dflags
+#endif
+
+        let modSummary = mod_summary { GHC.ms_hspp_opts = dynFlags }
 
         p' <- GHC.parseModule modSumWithRaw
-        let p = p' {GHC.pm_mod_summary = mod_summary}
+        let p = p' {GHC.pm_mod_summary = modSummary}
         liftIO $ saveParsed p
 
         tc <- GHC.typecheckModule p
