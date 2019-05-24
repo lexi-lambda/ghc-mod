@@ -47,7 +47,6 @@ import GHC.LanguageExtensions
 import DynFlags
 import HscTypes
 import Pretty
-import DynamicLoading
 
 import GhcMod.Caching
 import GhcMod.Cradle
@@ -558,11 +557,6 @@ loadTargets opts targetStrs mUpdateHooks = do
     setTargets targets
 
     when filterModSums $ updateModuleGraph setDynFlagsRecompile targetFileNames
-    dynFlags' <- getSessionDynFlags
-    dynFlags <- liftIO $ withLightHscEnv loadGhcEnv opts $ \env ->
-          DynamicLoading.initializePlugins env dynFlags'
-    _ <- setSessionDynFlags dynFlags
-    gmLog GmInfo "loadTargets" $ text "Initialised plugins"
 
     mg <- depanal [] False
 
