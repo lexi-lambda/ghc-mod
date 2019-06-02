@@ -4,7 +4,7 @@
 -- | Uses GHC hooks to load a TypecheckedModule
 
 module GhcMod.ModuleLoader
-  ( -- getModulesGhc
+  (
     getModulesGhc'
   ) where
 

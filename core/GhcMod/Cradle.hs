@@ -231,7 +231,7 @@ oldBuild = ProjSetup
 
 newBuild :: ProjSetup 'V2
 newBuild = ProjSetup
-    { psDistDir   = \dir  -> DistDirV2 (dir </> "dist-newstyle")
+    { psDistDir   = \cabal_file  -> DistDirV2 (takeDirectory cabal_file </> "dist-newstyle")
     , psProjDir   = \cabal_file _ -> ProjLocV2Dir (takeDirectory cabal_file)
     }
 

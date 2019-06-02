@@ -202,7 +202,6 @@ runCHQuery ps a = do
 
 -- ---------------------------------------------------------------------
 
--- <<<<<<< HEAD
 runProjSetup :: (IOish m, GmOut m, GmEnv m, Typeable pt)
              => ProjSetup (pt :: ProjType) -> FilePath -> (QueryEnv (pt :: ProjType) -> IO a) -> m a
 runProjSetup ps cabalFile f = do
