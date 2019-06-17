@@ -8,6 +8,7 @@ module GhcMod.ModuleLoader
     getModulesGhc'
   ) where
 
+import           Control.Concurrent.MVar
 import           Control.Monad.IO.Class
 
 import qualified Data.Map                          as Map
@@ -60,14 +61,16 @@ getModulesGhc' wrapper targetFile = do
   cfileName <- liftIO $ canonicalizePath targetFile
   mfs <- GM.getMMappedFiles
   mFileName <- liftIO . canonicalizePath $ getMappedFileName cfileName mfs
-  refTypechecked <- liftIO $ newIORef Nothing
-  refParsed <- liftIO $ newIORef Nothing
+
+  -- be careful if using IORef here! They might leak!
+  refTypechecked <- liftIO newEmptyMVar
+  refParsed <- liftIO newEmptyMVar
   let keepInfo = pure . (mFileName ==)
-      saveTypechecked = writeIORef refTypechecked . Just
-      saveParsed = writeIORef refParsed . Just
+      saveTypechecked = putMVar refTypechecked
+      saveParsed = putMVar refParsed
   res <- getModulesGhc wrapper [cfileName] keepInfo saveTypechecked saveParsed
-  mtm <- liftIO $ readIORef refTypechecked
-  mpm <- liftIO $ readIORef refParsed
+  mtm <- liftIO $ tryTakeMVar refTypechecked
+  mpm <- liftIO $ tryTakeMVar refParsed
   return (res, mtm, mpm)
 
 -- | like getModulesGhc' but allows you to keep an arbitary number of Modules
