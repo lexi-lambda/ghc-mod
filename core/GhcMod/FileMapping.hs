@@ -13,6 +13,7 @@ import GhcMod.HomeModuleGraph
 import GhcMod.Utils
 
 import System.IO
+import System.IO.Temp
 import System.FilePath
 import System.Directory
 
@@ -45,15 +46,23 @@ loadMappedFileSource :: IOish m
                      -> String -- ^ \'src\', source
                      -> GhcModT m ()
 loadMappedFileSource from src = do
-  tmpdir <- cradleTempDir `fmap` cradle
+  parentTmpdir <- cradleTempDir `fmap` cradle
+  let fromFileName = takeFileName from
+  tmpdir <- liftIO $ createTempDirectory parentTmpdir fromFileName
+
   enc <- liftIO . mkTextEncoding . optEncoding =<< options
   to <- liftIO $ do
-    (fn', h) <- openTempFile tmpdir (takeFileName from)
-    fn <- getCanonicalFileNameSafe fn'
-    hSetEncoding h enc
-    hPutStr h src
-    hClose h
+    fn <- getCanonicalFileNameSafe (tmpdir </> fromFileName)
+    withFile fn WriteMode $ \h -> do
+      hSetEncoding h enc
+      hPutStr h src
     return fn
+
+  liftIO $ do
+    let bootPath = from ++ "-boot"
+    bootExists <- doesFileExist bootPath
+    when bootExists $ copyFile bootPath (tmpdir </> takeFileName bootPath)
+
   loadMappedFile' from to True
 
 loadMappedFile' :: IOish m => FilePath -> FilePath -> Bool -> GhcModT m ()
